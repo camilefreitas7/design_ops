@@ -785,11 +785,8 @@ function renderCap(){
       ].map(d=>`<div class="cap-box"><div class="cl">${d.l}</div><div class="cv" style="color:${d.c}">${d.v}</div></div>`).join('')}
     </div>
     <div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-      <div class="tooltip-wrap" style="gap:6px">
-        <span style="font-size:11px;color:var(--muted);font-weight:300">Intensidade real do mês</span>
-        <i class="tt-icon" data-tt="">?</i>
-        <div class="tt"><strong>O que é Carga Ponderada?</strong><br><br>Mede o esforço real do time, não só as horas no relógio. Nem toda hora é igual — uma hora em IDV estratégico drena muito mais que uma hora ajustando um story.<br><br>Cada nível tem um peso:<br>Baixa ×1 · Média ×2 · Alta ×3<br>Complexa ×4 · <strong>Estratégica ×5</strong><br><br>Em ${cxKeyCap}: ${f1(cxdCap.raw_h)}h brutas → <strong>${f1(cxdCap.weighted_h)}h ponderadas</strong>.<br>Fator ×${wfCap} — por isso meses com poucas horas podem ser exaustivos.</div>
-      </div>
+      <span style="font-size:11px;color:var(--muted);font-weight:300">Intensidade real do mês</span>
+        
       <div style="font-size:16px;font-weight:800;color:${wfColor}">×${wfCap} <span style="font-size:11px;font-weight:300;color:var(--muted)">${f1(cxdCap.weighted_h)}h ponderadas</span></div>
     </div>`;
 
@@ -1264,11 +1261,11 @@ function renderFused() {
   }).join('');
 
   // ── LINE CHART — complexity trends ──
-  const svgW = 520, svgH = 110, padL = 32, padR = 16, padT = 12, padB = 20;
+  const svgW = 560, svgH = 140, padL = 36, padR = 20, padT = 20, padB = 26;
   const innerW = svgW - padL - padR;
   const innerH = svgH - padT - padB;
   const xPos = (i) => padL + (i / (CX_MONTHS.length - 1)) * innerW;
-  const maxPct = 60;
+  const maxPct = 65;
 
   let svgContent = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">`;
 
@@ -1301,7 +1298,13 @@ function renderFused() {
       const x = xPos(i);
       svgContent += `<circle cx="${x}" cy="${y}" r="3.5" fill="${col}" stroke="#191c26" stroke-width="1.5"/>`;
       if (pct > 0) {
-        svgContent += `<text x="${x}" y="${y - 7}" text-anchor="middle" fill="${col}" font-size="9" font-family="Helvena,sans-serif" font-weight="700">${Math.round(pct)}%</text>`;
+        // stagger label offset by level index to avoid overlap
+      var lvIdx = LEVELS.indexOf(lv);
+      var yOff  = (lvIdx % 2 === 0) ? -10 : 7;
+      var anchor = yOff < 0 ? 'middle' : 'middle';
+      var labelY = yOff < 0 ? (y + yOff) : (y + yOff + 4);
+      if(labelY < 10) labelY = y + 10;
+      svgContent += '<text x="' + x + '" y="' + labelY + '" text-anchor="middle" fill="' + col + '" font-size="9" font-family="Helvena,sans-serif" font-weight="700">' + Math.round(pct) + '%</text>';
       }
     });
   });
@@ -1341,15 +1344,7 @@ function renderFused() {
         </div>
         <div class="tooltip-wrap">
           <span style="font-size:12px;color:var(--muted);font-weight:300">O que é Carga Ponderada?</span>
-          <i class="tt-icon" data-tt="">?</i>
-          <div class="tt">
-            <strong>Carga Ponderada</strong> mede o esforço real do time, não só as horas no relógio.<br><br>
-            Cada nível de complexidade tem um peso:<br>
-            Baixa ×1 · Média ×2 · Alta ×3 · Complexa ×4 · <strong>Estratégica ×5</strong><br><br>
-            Em ${cxKey} vocês trabalharam <strong>${f1(cxd.raw_h)}h brutas</strong>, mas a carga ponderada foi
-            <strong>${f1(cxd.weighted_h)}h</strong> — fator <strong>×${ifactor}</strong>.<br><br>
-            Isso explica por que meses "com folga de capacidade" podem ser exaustivos: o volume está baixo, mas a intensidade está alta.
-          </div>
+          
         </div>
       </div>
       <div style="margin-top:14px;margin-bottom:2px;font-size:11px;color:var(--muted);font-weight:300;line-height:1.5">
@@ -1389,7 +1384,7 @@ let accounts = [
   { name:'Conta B', phase:'idv' },
   { name:'Produto',  phase:'idv' },
 ];
-let mixSliders = { Baixa:35, Média:40, Alta:15, Complexa:7, Estratégica:3 };
+let mixSliders = { Baixa:19, Média:23, Alta:8, Complexa:2, Estratégica:2 }; // defaults = média histórica Jan-Mar 2026
 const FASE_IDV_H    = 1*14.49 + 2*3.32;
 const FASE_SOCIAL_H = 8*0.44 + 12*1.33;
 const MANUT_SITE_H  = 3*0.44;
@@ -1424,77 +1419,109 @@ function renderSim() {
 function setSimMode(mode) { simMode = mode; renderSim(); }
 
 function renderSimMix(availH) {
-  const el = document.getElementById('simPanelMix');
-  const sliders = LEVELS.map(lv => {
-    const col = CX_COLORS[lv];
-    const val = mixSliders[lv];
-    return `<div class="slider-card">
-      <div class="slider-head">
-        <div class="slider-name" style="color:${col}">${lv}</div>
-        <div class="slider-val" id="sv-${lv}">${val}%</div>
-      </div>
-      <div class="slider-sub">~${f2(AVG_H[lv])}h / task em média real</div>
-      <input type="range" min="0" max="80" value="${val}"
-        oninput="mixSliders['${lv}']=+this.value;document.getElementById('sv-${lv}').textContent=this.value+'%';updateMixResult(${availH.toFixed(1)})">
-    </div>`;
+  var el  = document.getElementById('simPanelMix');
+  var avH = +availH;
+  var cards = LEVELS.map(function(lv) {
+    var col    = CX_COLORS[lv];
+    var val    = mixSliders[lv];
+    var maxVal = lv === 'Estratégica' ? 10 : lv === 'Complexa' ? 15 : lv === 'Alta' ? 30 : 60;
+    var hEst   = f1(val * AVG_H[lv]);
+    var hTask  = f2(AVG_H[lv]);
+    // Use data attributes — no string quoting issues in oninput
+    return '<div class="slider-card">'
+      + '<div class="slider-head">'
+        + '<div class="slider-name" style="color:' + col + '">' + lv + '</div>'
+        + '<div style="display:flex;align-items:center;gap:6px">'
+          + '<div class="slider-val" id="sv-' + lv + '">' + val + '</div>'
+          + '<span style="font-size:11px;color:var(--muted);font-weight:300">tasks</span>'
+        + '</div>'
+      + '</div>'
+      + '<div class="slider-sub" id="ss-' + lv + '">~' + hTask + 'h/task  ·  ~' + hEst + 'h totais</div>'
+      + '<input type="range" min="0" max="' + maxVal + '" value="' + val + '" '
+        + 'data-lv="' + lv + '" data-avh="' + avH + '" class="mix-slider">'
+      + '</div>';
   }).join('');
 
-  el.innerHTML = `
-    <div style="font-size:12px;color:var(--muted);font-weight:300;margin-bottom:14px;line-height:1.6">
-      Ajuste o % esperado de cada tipo de demanda e veja em tempo real quantas tasks o time absorve — e se cabe dentro da capacidade disponível.
-    </div>
-    <div class="slider-grid">${sliders}</div>
-    <div id="mixResult"></div>
-  `;
-  setTimeout(() => updateMixResult(availH), 30);
+  el.innerHTML = '<div style="font-size:12px;color:var(--muted);font-weight:300;margin-bottom:6px;line-height:1.6">'
+      + 'Defina quantas tasks de cada nível você espera no mês. O dashboard calcula as horas reais e mostra se o time consegue absorver.'
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--muted);font-weight:300;margin-bottom:14px">'
+      + 'Defaults baseados na média histórica de Jan–Mar 2026.'
+    + '</div>'
+    + '<div class="slider-grid">' + cards + '</div>'
+    + '<div id="mixResult"></div>';
+
+  // Attach event listeners after render — no inline handlers
+  el.querySelectorAll('.mix-slider').forEach(function(inp) {
+    inp.addEventListener('input', function() {
+      var lv   = this.dataset.lv;
+      var val  = +this.value;
+      var avH2 = +this.dataset.avh;
+      mixSliders[lv] = val;
+      var numEl = document.getElementById('sv-' + lv);
+      var subEl = document.getElementById('ss-' + lv);
+      if(numEl) numEl.textContent = val;
+      if(subEl) subEl.textContent = '~' + f2(AVG_H[lv] * val) + 'h/task  ·  ~' + f1(AVG_H[lv] * val) + 'h totais';
+      updateMixResult(avH2);
+    });
+  });
+
+  updateMixResult(avH);
 }
 
 function updateMixResult(availH) {
-  const el = document.getElementById('mixResult');
+  var el = document.getElementById('mixResult');
   if (!el) return;
-  const total = Object.values(mixSliders).reduce((s,v)=>s+v,0);
-  if (!total) { el.innerHTML=''; return; }
 
-  const N = 100;
-  let totalH = 0;
-  let breakdown = '';
-  LEVELS.forEach(lv => {
-    const share = mixSliders[lv] / total;
-    const tasks = Math.round(share * N);
-    totalH += tasks * AVG_H[lv];
-    const col = CX_COLORS[lv];
-    if (tasks > 0) breakdown += `<span style="color:${col};font-size:11px;font-weight:500">${tasks} ${lv} &nbsp;</span>`;
+  var totalTasks = 0;
+  var totalH = 0;
+  var rows = '';
+
+  LEVELS.forEach(function(lv) {
+    var n = mixSliders[lv] || 0;
+    var h = n * AVG_H[lv];
+    totalTasks += n;
+    totalH += h;
+    if(n > 0) {
+      var col = CX_COLORS[lv];
+      rows += '<span style="color:'+col+';font-size:11px;font-weight:500">'+n+' '+lv+'</span> ';
+    }
   });
 
-  const hPer100 = totalH;
-  const canAbsorb = Math.floor(availH / (hPer100 / N));
-  const pctUsed = clp(hPer100 / N / (availH / N) * 100, 0, 999);
+  if(totalTasks === 0) { el.innerHTML=''; return; }
 
-  let sc, si, sm;
-  if (pctUsed < 50)  { sc='var(--green)'; si='✅'; sm='Time absorve confortavelmente'; }
-  else if (pctUsed < 85) { sc='var(--amber)'; si='🟡'; sm='Atenção: carga relevante'; }
-  else { sc='var(--red)'; si='🚨'; sm='Ultrapassa capacidade — priorize ou contrate'; }
+  var pctUsed = clp(totalH / availH * 100, 0, 999);
+  var avgH    = totalH / totalTasks;
+  var remaining = availH - totalH;
 
-  el.innerHTML = `<div class="sim-result" style="background:${sc}0d;border-color:${sc}33">
-    <div class="sim-res-grid">
-      <div class="sim-res-item"><div class="sri-label">Tasks absorvíveis</div>
-        <div class="sri-val" style="color:${sc}">${canAbsorb}</div>
-        <div class="sri-sub">com este mix</div></div>
-      <div class="sim-res-item"><div class="sri-label">Horas / 100 tasks</div>
-        <div class="sri-val">${f0(hPer100)}h</div>
-        <div class="sri-sub">vs ${f1(availH)}h disponíveis</div></div>
-      <div class="sim-res-item"><div class="sri-label">Ocupação da capacidade</div>
-        <div class="sri-val" style="color:${sc}">${f1(Math.min(pctUsed,999))}%</div>
-        <div class="sri-sub">da capacidade livre</div></div>
-      <div class="sim-res-item"><div class="sri-label">Sinal</div>
-        <div class="sri-val" style="font-size:20px">${si}</div>
-        <div class="sri-sub" style="color:${sc};font-weight:500">${sm}</div></div>
-    </div>
-    <div class="sim-warn" style="background:${sc}0d">
-      Mix projetado (100 tasks): ${breakdown}<br>
-      Tempo médio ponderado: <strong style="color:var(--text)">${f2(hPer100/N)}h/task</strong>
-    </div>
-  </div>`;
+  var sc, si, sm;
+  if(pctUsed < 50)       { sc='var(--green)'; si='✅'; sm='Time absorve confortavelmente'; }
+  else if(pctUsed < 80)  { sc='var(--amber)'; si='🟡'; sm='Atenção: carga relevante'; }
+  else if(pctUsed < 100) { sc='var(--amber)'; si='⚠️'; sm='Próximo do limite — priorize'; }
+  else                   { sc='var(--red)';   si='🚨'; sm='Ultrapassa capacidade — considere contratar'; }
+
+  el.innerHTML =
+    '<div class="sim-result" style="background:'+sc+'0d;border-color:'+sc+'33">' +
+      '<div class="sim-res-grid">' +
+        '<div class="sim-res-item"><div class="sri-label">Total de tasks</div>' +
+          '<div class="sri-val">'+totalTasks+'</div>' +
+          '<div class="sri-sub">tasks projetadas</div></div>' +
+        '<div class="sim-res-item"><div class="sri-label">Horas necessárias</div>' +
+          '<div class="sri-val" style="color:'+sc+'">'+f1(totalH)+'h</div>' +
+          '<div class="sri-sub">de '+f1(availH)+'h disponíveis</div></div>' +
+        '<div class="sim-res-item"><div class="sri-label">Ocupação resultante</div>' +
+          '<div class="sri-val" style="color:'+sc+'">'+f1(Math.min(pctUsed,999))+'%</div>' +
+          '<div class="sri-sub">'+(remaining>=0 ? f1(remaining)+'h livres' : f1(Math.abs(remaining))+'h excedente')+'</div></div>' +
+        '<div class="sim-res-item"><div class="sri-label">Sinal</div>' +
+          '<div class="sri-val" style="font-size:20px">'+si+'</div>' +
+          '<div class="sri-sub" style="color:'+sc+';font-weight:500">'+sm+'</div></div>' +
+      '</div>' +
+      '<div class="sim-warn" style="background:'+sc+'0d">' +
+        'Projeção: '+rows+'<br>' +
+        'Tempo médio ponderado: <strong style="color:var(--text)">'+f2(avgH)+'h/task</strong> ' +
+        '· Referência histórica: '+f2((49.8/59+69.9/46+155.5/64)/3)+'h/task' +
+      '</div>' +
+    '</div>';
 }
 
 function renderSimAcct(availH, m, capPP) {
