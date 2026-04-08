@@ -288,9 +288,162 @@ body{font-family:'Helvena',system-ui,sans-serif;font-weight:300;background:#0d0e
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:100px}
+
+/* ─── TOOLTIP — posicionado via JS no viewport, nunca cortado ─── */
+.tt-icon { width:16px; height:16px; border-radius:50%; background:rgba(123,97,255,0.2);
+  border:1px solid rgba(123,97,255,0.4); display:inline-flex; align-items:center;
+  justify-content:center; font-size:9px; color:#a48fff; font-weight:700;
+  margin-left:6px; flex-shrink:0; font-style:normal; cursor:help; }
+#tt-global {
+  position:fixed; z-index:9999; pointer-events:none;
+  background:#0d0e12; border:1px solid rgba(123,97,255,0.35);
+  color:#ededf0; font-size:12px; font-weight:300; line-height:1.65;
+  padding:12px 14px; border-radius:10px; width:270px; max-width:90vw;
+  box-shadow:0 8px 32px rgba(0,0,0,0.7);
+  opacity:0; transition:opacity .15s; transform:translateX(-50%);
+}
+#tt-global.show { opacity:1; }
+#tt-global strong { color:#a48fff; font-weight:700 }
+.tooltip-wrap { display:inline-flex; align-items:center; }
+.tooltip-wrap .tt { display:none }
+
+/* ─── FUSED CAPACITY + COMPLEXITY SECTION ─── */
+.fused-wrap { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden }
+
+/* absorption top */
+.fused-top { padding:24px 24px 0 }
+.fused-title-row { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:4px; flex-wrap:wrap }
+.absorb-big { font-size:52px; font-weight:800; letter-spacing:-0.03em; line-height:1;
+  background:linear-gradient(135deg,#a48fff,#00c9b1); -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent; background-clip:text }
+.absorb-range { font-size:11px; color:var(--muted); font-weight:300; margin-top:4px; line-height:1.5 }
+.absorb-range strong { color:var(--text); font-weight:600 }
+
+/* person absorption cards */
+.pabs-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:11px; margin-top:18px }
+.pabs-card { background:var(--card2); border-radius:11px; padding:14px 16px; border:1px solid var(--border) }
+.pabs-top { display:flex; align-items:center; gap:9px; margin-bottom:12px }
+.pabs-av { width:32px; height:32px; border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0 }
+.pabs-name { font-size:13px; font-weight:700; color:var(--text) }
+.pabs-role { font-size:10px; color:var(--muted); font-weight:300 }
+.pabs-row { display:flex; justify-content:space-between; align-items:center;
+  font-size:11px; color:var(--muted); padding:4px 0; border-bottom:1px solid var(--border); font-weight:300 }
+.pabs-row:last-child { border-bottom:none }
+.pabs-row strong { font-size:12px; font-weight:700; color:var(--text) }
+.pabs-equiv { margin-top:10px; padding:8px 10px; background:var(--card); border-radius:7px;
+  font-size:10px; color:var(--muted); font-weight:300; line-height:1.6 }
+.pabs-equiv span { display:block; margin-bottom:1px }
+.pabs-equiv b { font-weight:600; color:var(--text) }
+
+/* divider */
+.fused-divider { height:1px; background:var(--border); margin:24px 0 0 }
+
+/* complexity breakdown */
+.cx-section { padding:20px 24px 24px }
+.cx-section-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:4px; display:flex; align-items:center; gap:8px }
+.cx-section-sub { font-size:12px; color:var(--muted); font-weight:300; margin-bottom:20px; line-height:1.5 }
+
+/* intensity badge */
+.intensity-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 11px;
+  border-radius:20px; font-size:11px; font-weight:600; border:1px solid }
+
+/* levels grid */
+.levels-grid { display:flex; flex-direction:column; gap:10px }
+.level-row { background:var(--card2); border-radius:10px; padding:12px 16px; border:1px solid var(--border) }
+.level-header { display:flex; align-items:center; gap:10px; margin-bottom:8px }
+.level-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0 }
+.level-name { font-size:13px; font-weight:700; color:var(--text) }
+.level-meta { font-size:11px; color:var(--muted); font-weight:300; margin-left:auto; display:flex; align-items:center; gap:12px }
+.level-meta span { white-space:nowrap }
+.level-meta strong { color:var(--text); font-weight:600 }
+.level-bar-wrap { margin-bottom:10px }
+.level-bar-track { background:var(--card); border-radius:100px; height:5px; overflow:hidden }
+.level-bar-fill { height:100%; border-radius:100px }
+.designers-row { display:flex; gap:8px; flex-wrap:wrap }
+.d-chip { display:flex; align-items:center; gap:5px; padding:3px 9px;
+  border-radius:20px; font-size:11px; font-weight:400; border:1px solid var(--border) }
+.d-chip .d-av { width:16px; height:16px; border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:8px; font-weight:700; color:#fff; flex-shrink:0 }
+.d-chip .d-info { color:var(--dim) }
+.d-chip .d-info strong { color:var(--text); font-weight:600 }
+
+/* line chart */
+.line-chart-wrap { margin-top:20px }
+.lc-title { font-size:12px; font-weight:600; color:var(--dim); margin-bottom:12px }
+.lc-svg-wrap { width:100%; overflow:hidden; border-radius:8px; background:var(--card); padding:12px 8px 6px }
+
+/* hire signal row */
+.fused-hire { padding:0 24px 24px }
+
+/* sim wrap stays separate */
+.sim-wrap { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px }
+.sim-tabs { display:flex; gap:4px; background:var(--card2); border:1px solid var(--border);
+  padding:3px; border-radius:9px; width:fit-content; margin:16px 0 }
+.sim-tab { padding:7px 16px; border-radius:6px; font-size:13px; font-weight:500;
+  font-family:'Helvena',sans-serif; cursor:pointer; border:none; background:transparent;
+  color:var(--muted); transition:all .15s }
+.sim-tab:hover { color:var(--text) }
+.sim-tab.active { background:var(--accent); color:#fff }
+.sim-panel { display:none }
+.sim-panel.active { display:block }
+.slider-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:11px; margin-bottom:20px }
+.slider-card { background:var(--card2); border-radius:10px; padding:14px 16px; border:1px solid var(--border) }
+.slider-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px }
+.slider-name { font-size:13px; font-weight:600; color:var(--text) }
+.slider-val { font-size:14px; font-weight:800; font-family:'Helvena',monospace; color:var(--accent-lt) }
+.slider-sub { font-size:10px; color:var(--muted); font-weight:300; margin-bottom:8px }
+input[type=range] { width:100%; accent-color:var(--accent); cursor:pointer }
+.acct-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(195px,1fr)); gap:10px; margin-bottom:18px }
+.acct-card { background:var(--card2); border-radius:10px; padding:14px 16px; border:1px solid var(--border) }
+.phase-toggle { display:flex; gap:4px; margin:8px 0 10px }
+.ptog { padding:5px 10px; border-radius:5px; font-size:11px; font-weight:500;
+  font-family:'Helvena',sans-serif; cursor:pointer; border:1px solid var(--border2);
+  background:transparent; color:var(--muted); transition:all .15s }
+.ptog.active { background:var(--accent); border-color:var(--accent); color:#fff }
+.sim-result { border-radius:12px; padding:18px 22px; border:1px solid; margin-top:4px }
+.sim-res-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px }
+.sim-res-item .sri-label { font-size:10px; color:var(--muted); text-transform:uppercase;
+  letter-spacing:.1em; font-weight:400; margin-bottom:4px }
+.sim-res-item .sri-val { font-size:26px; font-weight:800; letter-spacing:-0.02em; line-height:1 }
+.sim-res-item .sri-sub { font-size:11px; color:var(--muted); font-weight:300; margin-top:3px }
+.sim-warn { margin-top:12px; font-size:12px; font-weight:300; line-height:1.6;
+  padding:10px 14px; border-radius:8px; color:var(--dim) }
+
 </style>
 </head>
 <body>
+<div id="tt-global"></div>
+<script>
+(function(){
+  const box = document.getElementById('tt-global');
+  document.addEventListener('mouseover', function(e){
+    const icon = e.target.closest('.tt-icon[data-tt]');
+    if(!icon) return;
+    box.innerHTML = icon.dataset.tt;
+    box.classList.add('show');
+    position(e);
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!box.classList.contains('show')) return;
+    position(e);
+  });
+  document.addEventListener('mouseout', function(e){
+    const icon = e.target.closest('.tt-icon[data-tt]');
+    if(icon) box.classList.remove('show');
+  });
+  function position(e){
+    const W=window.innerWidth, bw=270;
+    let x = e.clientX;
+    // clamp horizontally
+    x = Math.min(Math.max(x, bw/2+8), W-bw/2-8);
+    let y = e.clientY - box.offsetHeight - 14;
+    if(y < 8) y = e.clientY + 20;
+    box.style.left = x+'px';
+    box.style.top  = y+'px';
+  }
+})();
+</script>
 
 <div class="modal-bg" id="addModal">
   <div class="modal">
@@ -374,9 +527,15 @@ body{font-family:'Helvena',system-ui,sans-serif;font-weight:300;background:#0d0e
       <div class="slabel">Performance Individual</div>
       <div class="g3" id="peopleGrid"></div>
 
-      <div class="slabel">Expectativa de Absorção de Demandas</div>
-      <div class="dcard-wrap" id="demandWrap"></div>
-      <div id="hireSignal"></div>
+
+      <div class="slabel">Capacidade Real de Absorção</div>
+      <div class="fused-wrap" id="fusedWrap"></div>
+
+      <div style="margin-top:14px" id="hireSignal"></div>
+
+      <div class="slabel">Simulador de Cenários</div>
+      <div class="sim-wrap" id="simWrap"></div>
+
 
       <div class="slabel">Distribuição de Horas por Cliente</div>
       <div class="client-wrap" id="clientWrap"></div>
@@ -408,6 +567,10 @@ body{font-family:'Helvena',system-ui,sans-serif;font-weight:300;background:#0d0e
         <div class="rpt-grid" id="rptGrid"></div>
         <button class="add-rpt-btn" onclick="openM('addModal')"><div style="font-size:22px">＋</div>Adicionar relatório mensal</button>
       </div>
+
+
+      <div class="slabel">Leitura Automática dos Dados</div>
+      <div id="autoReportWrap"></div>
 
       <div style="margin-top:44px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
         <div style="font-size:11px;color:var(--muted);font-weight:300;letter-spacing:.08em;text-transform:uppercase">Spun · Design Ops</div>
@@ -537,6 +700,24 @@ function renderTabs(){
 function go(i){curIdx=i;renderAll();}
 
 // ── KPIs ──
+function buildIntensityFt(cxd, mname, wf, pctBruta){
+  var stratT = (cxd.levels['Estratégica'] && cxd.levels['Estratégica'].t) || 0;
+  var stratH = (cxd.levels['Estratégica'] && cxd.levels['Estratégica'].h) || 0;
+  var stratDes = ((cxd.levels['Estratégica'] && cxd.levels['Estratégica'].designers) || []).map(function(d){return d.n;}).join(' e ');
+  var why = '';
+  if(stratT > 0){
+    why = stratT+' task'+(stratT>1?'s':'')+' Estratégica'+(stratT>1?'s':'')+
+          (stratDes?' ('+stratDes+')':'')+' consumiram '+f1(stratH)+'h — '+
+          Math.round(stratH/(cxd.raw_h||1)*100)+'% da carga total. Por isso o esforço real é muito maior que as horas brutas sugerem.';
+  } else {
+    var altaP = (cxd.levels['Alta'] && cxd.levels['Alta'].pct)||0;
+    var compP = (cxd.levels['Complexa'] && cxd.levels['Complexa'].pct)||0;
+    why = 'O mês não teve demandas Estratégicas, mas '+Math.round(altaP+compP)+'% das tasks foram Alta ou Complexa, elevando a intensidade.';
+  }
+  var tt = 'Por que &times;'+wf+' em '+mname+'? '+why+'<br><br>'+f1(cxd.raw_h)+'h brutas &rarr; <strong>'+f1(cxd.weighted_h)+'h ponderadas</strong> (Estratégica vale &times;5, Baixa &times;1).';
+  return 'Carga ponderada: '+f1(cxd.weighted_h)+'h <i class="tt-icon" data-tt="'+tt.replace(/"/g,'&quot;')+'">?</i>';
+}
+
 function renderKPIs(){
   const m=MONTHS[curIdx], p=curIdx>0?MONTHS[curIdx-1]:null;
   const ap=active(m), prevAP=p?active(p):null;
@@ -548,11 +729,22 @@ function renderKPIs(){
     const d=c-pv,up=d>0;
     return `<span class="chip ${up?'chip-g':'chip-r'}">${d>=0?'↑':'↓'} ${Math.abs(d)>100?f0(Math.abs(d)):f1(Math.abs(d))}</span>`;
   }
+  const cxKey2 = ['Janeiro','Fevereiro','Março'][Math.min(curIdx, 2)];
+  const cxd2   = CX_DATA[cxKey2] || CX_DATA['Março'];
+  const wFactor = cxd2.intensity_factor;
+  const wColor  = wFactor>=3?'var(--red)':wFactor>=2.5?'var(--amber)':'var(--green)';
+
   const kpis=[
-    {ey:'Capacidade Usada', num:f1(m.pct)+'%', ft:`${f1(m.used)}h de ${f0(m.cap)}h`, badge:p?delta(m.pct,p.pct):''},
-    {ey:'Tasks Entregues',  num:totT,           ft:`${ap.length} designers ativos`,      badge:p?delta(totT,prevT):''},
-    {ey:'Artes Produzidas', num:totA,           ft:'peças finalizadas',                    badge:p?delta(totA,prevA):''},
-    {ey:'Custo Total',      num:cur(m.cost),    ft:'custo do time',                        badge:''},
+    {ey:'Capacidade Bruta Usada',
+     num:f1(m.pct)+'%',
+     ft:`${f1(m.used)}h de ${f0(m.cap)}h`,
+     badge:p?delta(m.pct,p.pct):''},
+    {ey:'Intensidade Real',
+     num:`<span style="color:${wColor}">×${wFactor}</span>`,
+     ft:buildIntensityFt(cxd2, cxKey2, wFactor, m.pct),
+     badge:''},
+    {ey:'Tasks Entregues',  num:totT, ft:`${ap.length} designers ativos`, badge:p?delta(totT,prevT):''},
+    {ey:'Artes Produzidas', num:totA, ft:'peças finalizadas',              badge:p?delta(totA,prevA):''},
   ];
   document.getElementById('kpiGrid').innerHTML=kpis.map(k=>
     `<div class="card kpi"><div class="kpi-ey">${k.ey}</div><div class="kpi-num">${k.num}</div><div class="kpi-ft">${k.ft} ${k.badge}</div></div>`
@@ -565,19 +757,40 @@ function renderCap(){
   const ap=active(m);
   const col=pctC(m.pct), grad=pctG(m.pct);
 
+  const cxKeyCap = ['Janeiro','Fevereiro','Março'][Math.min(curIdx,2)];
+  const cxdCap   = CX_DATA[cxKeyCap] || CX_DATA['Março'];
+  const wfCap    = cxdCap.intensity_factor;
+  const wfColor  = wfCap>=3?'var(--red)':wfCap>=2.5?'var(--amber)':'var(--green)';
+
   document.getElementById('capCard').innerHTML=`
     <div class="cap-hdr">
-      <div><div class="card-title">Capacidade Operacional</div>
-        <div class="card-sub">${m.wd} dias úteis · ${m.hd}h/dia · ${ap.length} designers ativos</div></div>
-      <div class="cap-big" style="color:${col}">${f1(m.pct)}%</div>
+      <div>
+        <div class="card-title">Capacidade Operacional</div>
+        <div class="card-sub">${m.wd} dias úteis · ${m.hd}h/dia · ${ap.length} designers ativos</div>
+      </div>
+      <div style="text-align:right">
+        <div class="cap-big" style="color:${col}">${f1(m.pct)}%</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:300;margin-top:2px">capacidade bruta</div>
+      </div>
     </div>
     <div class="pt" style="height:9px;margin-bottom:9px">
       <div class="pf" style="width:${clp(m.pct,1,100)}%;height:100%;background:${grad}"></div></div>
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:300;margin-bottom:4px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:300;margin-bottom:16px">
       <span>0h</span><span style="color:var(--text);font-weight:600">${f1(m.used)}h utilizadas</span><span>${f0(m.cap)}h total</span></div>
     <div class="cap-dg">
-      ${[{l:'Horas Usadas',v:f1(m.used)+'h',c:'var(--text)'},{l:'Horas Livres',v:f1(m.avail)+'h',c:'var(--green)'},{l:'% Livre',v:f1(100-m.pct)+'%',c:'var(--muted)'}]
-        .map(d=>`<div class="cap-box"><div class="cl">${d.l}</div><div class="cv" style="color:${d.c}">${d.v}</div></div>`).join('')}
+      ${[
+        {l:'Horas Usadas',  v:f1(m.used)+'h',  c:'var(--text)'},
+        {l:'Horas Livres',  v:f1(m.avail)+'h', c:'var(--green)'},
+        {l:'% Livre',       v:f1(100-m.pct)+'%', c:'var(--muted)'},
+      ].map(d=>`<div class="cap-box"><div class="cl">${d.l}</div><div class="cv" style="color:${d.c}">${d.v}</div></div>`).join('')}
+    </div>
+    <div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div class="tooltip-wrap" style="gap:6px">
+        <span style="font-size:11px;color:var(--muted);font-weight:300">Intensidade real do mês</span>
+        <i class="tt-icon" data-tt="">?</i>
+        <div class="tt"><strong>O que é Carga Ponderada?</strong><br><br>Mede o esforço real do time, não só as horas no relógio. Nem toda hora é igual — uma hora em IDV estratégico drena muito mais que uma hora ajustando um story.<br><br>Cada nível tem um peso:<br>Baixa ×1 · Média ×2 · Alta ×3<br>Complexa ×4 · <strong>Estratégica ×5</strong><br><br>Em ${cxKeyCap}: ${f1(cxdCap.raw_h)}h brutas → <strong>${f1(cxdCap.weighted_h)}h ponderadas</strong>.<br>Fator ×${wfCap} — por isso meses com poucas horas podem ser exaustivos.</div>
+      </div>
+      <div style="font-size:16px;font-weight:800;color:${wfColor}">×${wfCap} <span style="font-size:11px;font-weight:300;color:var(--muted)">${f1(cxdCap.weighted_h)}h ponderadas</span></div>
     </div>`;
 
   document.getElementById('costCard').innerHTML=`
@@ -669,12 +882,14 @@ function renderDemand(){
 // ── HIRE SIGNAL ──
 function renderHire(){
   const last=MONTHS.slice(-3), avg=last.reduce((s,m)=>s+m.pct,0)/last.length;
+  const el = document.getElementById('hireSignal');
+  // Só mostra sinal quando a situação requer atenção (>= 40% média)
+  if(avg < 40){ el.innerHTML=''; return; }
   let icon,title,desc,bdr,bg;
-  if(avg<35)      {icon='✅';title='Capacidade confortável';      bdr='var(--green)';bg='rgba(0,214,143,.06)'; desc=`Média ${last.length} meses: <strong>${f1(avg)}%</strong>. Sem sinal de contratação imediata.`;}
-  else if(avg<55) {icon='🟡';title='Carga crescendo — monitorar'; bdr='var(--amber)';bg='rgba(255,184,0,.06)'; desc=`Média: <strong>${f1(avg)}%</strong>. Boa janela para planejar onboarding com antecedência.`;}
-  else if(avg<75) {icon='⚠️';title='Alerta — iniciar busca agora'; bdr='var(--amber)';bg='rgba(255,184,0,.08)'; desc=`Média: <strong>${f1(avg)}%</strong>. Tendência de alta — abrir vaga agora, onboarding leva 60–90 dias.`;}
-  else            {icon='🚨';title='Crítico — contratar já';       bdr='var(--red)';  bg='rgba(255,77,106,.08)';desc=`Média: <strong>${f1(avg)}%</strong>. Time no limite. Processo imediato.`;}
-  document.getElementById('hireSignal').innerHTML=`
+  if(avg<55) {icon='🟡';title='Carga crescendo — monitorar';  bdr='var(--amber)';bg='rgba(255,184,0,.06)'; desc=`Média dos últimos ${last.length} meses: <strong>${f1(avg)}%</strong>. Boa janela para planejar onboarding com antecedência antes de precisar urgente.`;}
+  else if(avg<75){icon='⚠️';title='Alerta — iniciar busca agora';bdr='var(--amber)';bg='rgba(255,184,0,.08)'; desc=`Média: <strong>${f1(avg)}%</strong>. Tendência de alta. Abrir processo seletivo agora — onboarding leva 60–90 dias.`;}
+  else       {icon='🚨';title='Crítico — contratar já';         bdr='var(--red)';  bg='rgba(255,77,106,.08)';desc=`Média: <strong>${f1(avg)}%</strong>. Time no limite. Iniciar processo imediatamente.`;}
+  el.innerHTML=`
     <div class="hire-box" style="background:${bg};border-color:${bdr}44">
       <div style="font-size:22px;flex-shrink:0">${icon}</div>
       <div style="flex:1;min-width:180px">
@@ -911,9 +1126,564 @@ function renderDates(){
   const ft=document.getElementById('footerDate');if(ft)ft.textContent='Atualizado em '+now.toLocaleDateString('pt-BR')+' · '+MONTHS.length+' meses';
 }
 
+
+// ================================================================
+// COMPLEXITY DATA — ClickUp Jan–Mar 2026
+// ================================================================
+const CX_DATA = {
+  'Janeiro':   { total:59,  raw_h:49.8,  weighted_h:143.6, avg_w:2.08, intensity_factor:2.9,
+    levels:{ Baixa:{t:14,pct:23.7,h:3.4,designers:[{n:'Camile',t:6,h:2.2},{n:'Júlia',t:5,h:1.0},{n:'Carol',t:3,h:0.3}]}, Média:{t:30,pct:50.8,h:20.5,designers:[{n:'Camile',t:8,h:5.9},{n:'Júlia',t:14,h:8.4},{n:'Carol',t:6,h:5.9}]}, Alta:{t:10,pct:16.9,h:11.8,designers:[{n:'Camile',t:3,h:9.3},{n:'Júlia',t:1,h:0.5},{n:'Carol',t:6,h:1.9}]}, Complexa:{t:3,pct:5.1,h:5.9,designers:[{n:'Camile',t:1,h:5.1},{n:'Júlia',t:1,h:0.7},{n:'Carol',t:1,h:0.1}]}, Estratégica:{t:1,pct:1.7,h:8.0,designers:[{n:'Camile',t:1,h:8.0}]} }},
+  'Fevereiro': { total:46,  raw_h:69.9,  weighted_h:194.8, avg_w:1.87, intensity_factor:2.8,
+    levels:{ Baixa:{t:18,pct:39.1,h:12.2,designers:[{n:'Camile',t:8,h:5.6},{n:'Júlia',t:10,h:6.6}]}, Média:{t:20,pct:43.5,h:25.8,designers:[{n:'Camile',t:10,h:14.8},{n:'Júlia',t:10,h:11.0}]}, Alta:{t:6,pct:13.0,h:14.2,designers:[{n:'Camile',t:3,h:7.4},{n:'Júlia',t:3,h:6.8}]}, Complexa:{t:0,pct:0,h:0,designers:[]}, Estratégica:{t:2,pct:4.3,h:17.6,designers:[{n:'Camile',t:2,h:17.6}]} }},
+  'Março':     { total:64,  raw_h:155.5, weighted_h:532.4, avg_w:1.94, intensity_factor:3.4,
+    levels:{ Baixa:{t:26,pct:40.6,h:9.7,designers:[{n:'Camile',t:21,h:6.2},{n:'Júlia',t:5,h:4.8}]}, Média:{t:20,pct:31.2,h:46.8,designers:[{n:'Camile',t:10,h:23.0},{n:'Júlia',t:10,h:26.1}]}, Alta:{t:9,pct:14.1,h:25.8,designers:[{n:'Camile',t:4,h:12.6},{n:'Júlia',t:4,h:13.2}]}, Complexa:{t:2,pct:3.1,h:10.7,designers:[{n:'Camile',t:1,h:6.7},{n:'Júlia',t:2,h:10.7}]}, Estratégica:{t:3,pct:4.7,h:61.3,designers:[{n:'Camile',t:2,h:56.3},{n:'Júlia',t:1,h:5.0}]} }},
+};
+const AVG_H   = { Baixa:0.44, Média:1.33, Alta:2.07, Complexa:3.32, Estratégica:14.49 };
+const CX_COLORS = { Baixa:'#00d68f', Média:'#7b61ff', Alta:'#ffb800', Complexa:'#ff4d6a', Estratégica:'#f093fb' };
+const LEVELS  = ['Baixa','Média','Alta','Complexa','Estratégica'];
+const CX_MONTHS = ['Janeiro','Fevereiro','Março'];
+
+// ── FUSED SECTION: Absorção + Complexidade ──
+function renderFused() {
+  const m  = MONTHS[curIdx];
+  const ap = active(m);
+  const capPP = m.wd * m.hd;
+
+  // current month cx data (best match)
+  const mnames = CX_MONTHS;
+  const cxKey  = mnames[Math.min(curIdx, mnames.length-1)];
+  const cxd    = CX_DATA[cxKey] || CX_DATA['Março'];
+
+  // ── ABSORPTION PER PERSON ──
+  const personCards = ap.map(p => {
+    const cfg  = PC[p.n] || { color:'#9ca3af', exec:1, mgr:false };
+    const col  = cfg.color;
+    const ini  = p.n.slice(0,2).toUpperCase();
+    const avail = Math.max(capPP - p.h, 0);
+    const real  = avail * cfg.exec;
+
+    // equiv tasks per complexity
+    const equivEst  = real > 0 ? Math.floor(real / AVG_H['Estratégica']) : 0;
+    const equivComp = real > 0 ? Math.floor(real / AVG_H['Complexa'])    : 0;
+    const equivMed  = real > 0 ? Math.floor(real / AVG_H['Média'])       : 0;
+    const equivBx   = real > 0 ? Math.floor(real / AVG_H['Baixa'])       : 0;
+
+    // weighted absorb using historical mix
+    const wAvgH = LEVELS.reduce((s,lv) => {
+      const share = (cxd.levels[lv]?.pct||0) / 100;
+      return s + share * AVG_H[lv];
+    }, 0);
+    const weightedAbsorb = wAvgH > 0 ? Math.floor(real / wAvgH) : 0;
+
+    return `<div class="pabs-card">
+      <div class="pabs-top">
+        <div class="pabs-av" style="background:linear-gradient(135deg,${col},${col}88)">${ini}</div>
+        <div>
+          <div class="pabs-name">${p.n}</div>
+          <div class="pabs-role">${cfg.role||'Designer'}</div>
+        </div>
+        ${cfg.mgr ? '<span style="font-size:9px;background:rgba(123,97,255,.14);color:var(--accent-lt);padding:2px 7px;border-radius:20px;border:1px solid rgba(123,97,255,.22);font-weight:600;margin-left:auto;white-space:nowrap">Gestão</span>' : ''}
+      </div>
+      <div class="pabs-row"><span>Margem disponível no mês</span><strong>${f0(avail)}h</strong></div>
+      ${cfg.mgr ? `<div class="pabs-row" style="color:var(--amber)">
+        <span>Reservado à gestão (30%)</span>
+        <strong style="color:var(--amber)">−${f0(avail*0.30)}h</strong>
+      </div>` : ''}
+      <div class="pabs-row"><span>Disponível p/ execução</span><strong>${f0(real)}h</strong></div>
+      <div class="pabs-row" style="color:var(--text)">
+        <span><strong>Absorção (mix histórico)</strong></span>
+        <strong style="color:${col};font-size:15px">${weightedAbsorb} tasks</strong>
+      </div>
+      <div class="pabs-equiv">
+        <span>Equivale a:</span>
+        ${equivEst > 0  ? `<span>→ <b>${equivEst}</b> tasks Estratégicas</span>`  : ''}
+        ${equivComp > 0 ? `<span>→ <b>${equivComp}</b> tasks Complexas</span>`    : ''}
+        <span>→ <b>${equivMed}</b> tasks Médias</span>
+        <span>→ <b>${equivBx}</b> tasks Baixas</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Total weighted absorb
+  const totalWeighted = ap.reduce((s, p) => {
+    const cfg   = PC[p.n] || { exec:1 };
+    const avail = Math.max(capPP - p.h, 0) * cfg.exec;
+    const wAvgH = LEVELS.reduce((sum, lv) => sum + (cxd.levels[lv]?.pct||0)/100 * AVG_H[lv], 0);
+    return s + (wAvgH > 0 ? Math.floor(avail / wAvgH) : 0);
+  }, 0);
+
+  const totalEquivEst = ap.reduce((s, p) => {
+    const cfg = PC[p.n] || { exec:1 };
+    const r = Math.max(capPP - p.h, 0) * cfg.exec;
+    return s + Math.floor(r / AVG_H['Estratégica']);
+  }, 0);
+
+  const totalEquivBx = ap.reduce((s, p) => {
+    const cfg = PC[p.n] || { exec:1 };
+    const r = Math.max(capPP - p.h, 0) * cfg.exec;
+    return s + Math.floor(r / AVG_H['Baixa']);
+  }, 0);
+
+  // ── INTENSITY BADGE ──
+  const ifactor = cxd.intensity_factor;
+  const ibdColor = ifactor >= 3 ? 'var(--red)' : ifactor >= 2.5 ? 'var(--amber)' : 'var(--green)';
+  const ibdBg    = ifactor >= 3 ? 'rgba(255,77,106,.1)' : ifactor >= 2.5 ? 'rgba(255,184,0,.1)' : 'rgba(0,214,143,.1)';
+
+  // ── LEVELS BREAKDOWN ──
+  const maxH = Math.max(...LEVELS.map(lv => cxd.levels[lv]?.h || 0), 1);
+  const levelsHTML = LEVELS.map(lv => {
+    const ld = cxd.levels[lv];
+    if (!ld || ld.tasks === 0) return '';
+    const col  = CX_COLORS[lv];
+    const barW = clp(ld.h / maxH * 100, 2, 100);
+    const dChips = (ld.designers || []).map(d => {
+      const dc = PC[d.n]?.color || '#9ca3af';
+      return `<div class="d-chip" style="background:${dc}14;border-color:${dc}28">
+        <div class="d-av" style="background:linear-gradient(135deg,${dc},${dc}88)">${d.n.slice(0,2).toUpperCase()}</div>
+        <div class="d-info"><strong>${d.n}</strong> · ${d.t}t · ${f1(d.h)}h</div>
+      </div>`;
+    }).join('');
+    return `<div class="level-row">
+      <div class="level-header">
+        <div class="level-dot" style="background:${col}"></div>
+        <div class="level-name">${lv}</div>
+        <div class="level-meta">
+          <span><strong>${ld.tasks}</strong> tasks</span>
+          <span><strong>${f1(ld.h)}h</strong></span>
+          <span style="color:var(--muted)">${f1(ld.pct)}%</span>
+          <span style="color:var(--muted)">~${f2(AVG_H[lv])}h/task</span>
+        </div>
+      </div>
+      <div class="level-bar-wrap">
+        <div class="level-bar-track">
+          <div class="level-bar-fill" style="width:${barW}%;background:${col}"></div>
+        </div>
+      </div>
+      ${dChips ? `<div class="designers-row">${dChips}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // ── LINE CHART — complexity trends ──
+  const svgW = 520, svgH = 110, padL = 32, padR = 16, padT = 12, padB = 20;
+  const innerW = svgW - padL - padR;
+  const innerH = svgH - padT - padB;
+  const xPos = (i) => padL + (i / (CX_MONTHS.length - 1)) * innerW;
+  const maxPct = 60;
+
+  let svgContent = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">`;
+
+  // grid lines
+  [0, 20, 40, 60].forEach(v => {
+    const y = padT + innerH - (v / maxPct) * innerH;
+    svgContent += `<line x1="${padL}" y1="${y}" x2="${svgW-padR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+    svgContent += `<text x="${padL-4}" y="${y+4}" text-anchor="end" fill="#636680" font-size="9" font-family="Helvena,sans-serif">${v}%</text>`;
+  });
+
+  // month labels
+  CX_MONTHS.forEach((mn, i) => {
+    svgContent += `<text x="${xPos(i)}" y="${svgH-2}" text-anchor="middle" fill="#636680" font-size="10" font-family="Helvena,sans-serif">${mn.slice(0,3)}</text>`;
+  });
+
+  // lines per level
+  LEVELS.forEach(lv => {
+    const col = CX_COLORS[lv];
+    const pts = CX_MONTHS.map((mn, i) => {
+      const pct = CX_DATA[mn].levels[lv]?.pct || 0;
+      const y = padT + innerH - clp(pct / maxPct, 0, 1) * innerH;
+      return `${xPos(i)},${y}`;
+    });
+    svgContent += `<polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>`;
+
+    // dots
+    CX_MONTHS.forEach((mn, i) => {
+      const pct = CX_DATA[mn].levels[lv]?.pct || 0;
+      const y = padT + innerH - clp(pct / maxPct, 0, 1) * innerH;
+      const x = xPos(i);
+      svgContent += `<circle cx="${x}" cy="${y}" r="3.5" fill="${col}" stroke="#191c26" stroke-width="1.5"/>`;
+      if (pct > 0) {
+        svgContent += `<text x="${x}" y="${y - 7}" text-anchor="middle" fill="${col}" font-size="9" font-family="Helvena,sans-serif" font-weight="700">${Math.round(pct)}%</text>`;
+      }
+    });
+  });
+
+  svgContent += '</svg>';
+
+  // legend for line chart
+  const lineLegend = LEVELS.map(lv => {
+    const col = CX_COLORS[lv];
+    return `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--dim);font-weight:300">
+      <div style="width:18px;height:2px;background:${col};border-radius:2px;flex-shrink:0"></div>${lv}
+    </div>`;
+  }).join('');
+
+  // ── ASSEMBLE ──
+  document.getElementById('fusedWrap').innerHTML = `
+    <div class="fused-top">
+      <div class="fused-title-row">
+        <div>
+          <div class="card-title">Capacidade Real de Absorção</div>
+          <div class="card-sub" style="margin-top:3px;max-width:520px">
+            Calculado com base no mix histórico de complexidade de ${cxKey}.
+            O número de tasks absorvíveis varia radicalmente dependendo do tipo de demanda.
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="absorb-big">${totalWeighted}</div>
+          <div class="absorb-range">tasks (mix histórico)<br>
+            <strong>${totalEquivEst}</strong> se todas Estratégicas &nbsp;·&nbsp;
+            <strong>${totalEquivBx}</strong> se todas Baixas
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="intensity-badge" style="color:${ibdColor};background:${ibdBg};border-color:${ibdColor}44">
+          ⚡ Intensidade ${cxKey}: ×${ifactor}
+        </div>
+        <div class="tooltip-wrap">
+          <span style="font-size:12px;color:var(--muted);font-weight:300">O que é Carga Ponderada?</span>
+          <i class="tt-icon" data-tt="">?</i>
+          <div class="tt">
+            <strong>Carga Ponderada</strong> mede o esforço real do time, não só as horas no relógio.<br><br>
+            Cada nível de complexidade tem um peso:<br>
+            Baixa ×1 · Média ×2 · Alta ×3 · Complexa ×4 · <strong>Estratégica ×5</strong><br><br>
+            Em ${cxKey} vocês trabalharam <strong>${f1(cxd.raw_h)}h brutas</strong>, mas a carga ponderada foi
+            <strong>${f1(cxd.weighted_h)}h</strong> — fator <strong>×${ifactor}</strong>.<br><br>
+            Isso explica por que meses "com folga de capacidade" podem ser exaustivos: o volume está baixo, mas a intensidade está alta.
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;margin-bottom:2px;font-size:11px;color:var(--muted);font-weight:300;line-height:1.5">
+        As horas abaixo representam <strong style="color:var(--text)">o que ainda poderia ter sido absorvido neste mês</strong>,
+        com base na carga já registrada. Não é a capacidade total de cada pessoa — é a margem restante após o trabalho entregue.
+      </div>
+      <div class="pabs-grid" style="margin-top:10px">${personCards}</div>
+    </div>
+
+    <div class="fused-divider"></div>
+
+    <div class="cx-section">
+      <div class="cx-section-title">
+        Complexidade das entregas em ${cxKey}
+      </div>
+      <div class="cx-section-sub">
+        Distribuição real por nível e quem trabalhou em cada tipo.
+        Estratégica e Complexa têm baixo volume mas concentram a maior parte das horas.
+      </div>
+      <div class="levels-grid">${levelsHTML}</div>
+
+      <div class="line-chart-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <div class="lc-title">Tendência de complexidade — Jan a Mar</div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px">${lineLegend}</div>
+        </div>
+        <div class="lc-svg-wrap">${svgContent}</div>
+      </div>
+    </div>
+  `;
+}
+
+// ── SIM ──
+let simMode = 'mix';
+let accounts = [
+  { name:'Conta A', phase:'idv' },
+  { name:'Conta B', phase:'idv' },
+  { name:'Produto',  phase:'idv' },
+];
+let mixSliders = { Baixa:35, Média:40, Alta:15, Complexa:7, Estratégica:3 };
+const FASE_IDV_H    = 1*14.49 + 2*3.32;
+const FASE_SOCIAL_H = 8*0.44 + 12*1.33;
+const MANUT_SITE_H  = 3*0.44;
+
+function renderSim() {
+  const m  = MONTHS[curIdx];
+  const ap = active(m);
+  const capPP = m.wd * m.hd;
+  const availH = ap.reduce((s,p) => {
+    const exec = PC[p.n]?.exec || 1;
+    return s + Math.max(capPP - p.h, 0) * exec;
+  }, 0);
+
+  document.getElementById('simWrap').innerHTML = `
+    <div class="card-title">Simulador de Cenários</div>
+    <div class="card-sub" style="margin-top:3px">
+      Projete o impacto na capacidade do time com base em complexidade ou novas contas.
+      Tempos médios baseados nos dados reais de Jan–Mar 2026.
+    </div>
+    <div class="sim-tabs">
+      <button class="sim-tab ${simMode==='mix'?'active':''}" onclick="setSimMode('mix')">Mix de Complexidade</button>
+      <button class="sim-tab ${simMode==='acct'?'active':''}" onclick="setSimMode('acct')">Novas Contas</button>
+    </div>
+    <div id="simPanelMix"  class="sim-panel ${simMode==='mix' ?'active':''}"></div>
+    <div id="simPanelAcct" class="sim-panel ${simMode==='acct'?'active':''}"></div>
+  `;
+
+  if (simMode === 'mix')  renderSimMix(availH);
+  else                    renderSimAcct(availH, m, capPP);
+}
+
+function setSimMode(mode) { simMode = mode; renderSim(); }
+
+function renderSimMix(availH) {
+  const el = document.getElementById('simPanelMix');
+  const sliders = LEVELS.map(lv => {
+    const col = CX_COLORS[lv];
+    const val = mixSliders[lv];
+    return `<div class="slider-card">
+      <div class="slider-head">
+        <div class="slider-name" style="color:${col}">${lv}</div>
+        <div class="slider-val" id="sv-${lv}">${val}%</div>
+      </div>
+      <div class="slider-sub">~${f2(AVG_H[lv])}h / task em média real</div>
+      <input type="range" min="0" max="80" value="${val}"
+        oninput="mixSliders['${lv}']=+this.value;document.getElementById('sv-${lv}').textContent=this.value+'%';updateMixResult(${availH.toFixed(1)})">
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="font-size:12px;color:var(--muted);font-weight:300;margin-bottom:14px;line-height:1.6">
+      Ajuste o % esperado de cada tipo de demanda e veja em tempo real quantas tasks o time absorve — e se cabe dentro da capacidade disponível.
+    </div>
+    <div class="slider-grid">${sliders}</div>
+    <div id="mixResult"></div>
+  `;
+  setTimeout(() => updateMixResult(availH), 30);
+}
+
+function updateMixResult(availH) {
+  const el = document.getElementById('mixResult');
+  if (!el) return;
+  const total = Object.values(mixSliders).reduce((s,v)=>s+v,0);
+  if (!total) { el.innerHTML=''; return; }
+
+  const N = 100;
+  let totalH = 0;
+  let breakdown = '';
+  LEVELS.forEach(lv => {
+    const share = mixSliders[lv] / total;
+    const tasks = Math.round(share * N);
+    totalH += tasks * AVG_H[lv];
+    const col = CX_COLORS[lv];
+    if (tasks > 0) breakdown += `<span style="color:${col};font-size:11px;font-weight:500">${tasks} ${lv} &nbsp;</span>`;
+  });
+
+  const hPer100 = totalH;
+  const canAbsorb = Math.floor(availH / (hPer100 / N));
+  const pctUsed = clp(hPer100 / N / (availH / N) * 100, 0, 999);
+
+  let sc, si, sm;
+  if (pctUsed < 50)  { sc='var(--green)'; si='✅'; sm='Time absorve confortavelmente'; }
+  else if (pctUsed < 85) { sc='var(--amber)'; si='🟡'; sm='Atenção: carga relevante'; }
+  else { sc='var(--red)'; si='🚨'; sm='Ultrapassa capacidade — priorize ou contrate'; }
+
+  el.innerHTML = `<div class="sim-result" style="background:${sc}0d;border-color:${sc}33">
+    <div class="sim-res-grid">
+      <div class="sim-res-item"><div class="sri-label">Tasks absorvíveis</div>
+        <div class="sri-val" style="color:${sc}">${canAbsorb}</div>
+        <div class="sri-sub">com este mix</div></div>
+      <div class="sim-res-item"><div class="sri-label">Horas / 100 tasks</div>
+        <div class="sri-val">${f0(hPer100)}h</div>
+        <div class="sri-sub">vs ${f1(availH)}h disponíveis</div></div>
+      <div class="sim-res-item"><div class="sri-label">Ocupação da capacidade</div>
+        <div class="sri-val" style="color:${sc}">${f1(Math.min(pctUsed,999))}%</div>
+        <div class="sri-sub">da capacidade livre</div></div>
+      <div class="sim-res-item"><div class="sri-label">Sinal</div>
+        <div class="sri-val" style="font-size:20px">${si}</div>
+        <div class="sri-sub" style="color:${sc};font-weight:500">${sm}</div></div>
+    </div>
+    <div class="sim-warn" style="background:${sc}0d">
+      Mix projetado (100 tasks): ${breakdown}<br>
+      Tempo médio ponderado: <strong style="color:var(--text)">${f2(hPer100/N)}h/task</strong>
+    </div>
+  </div>`;
+}
+
+function renderSimAcct(availH, m, capPP) {
+  const el = document.getElementById('simPanelAcct');
+  const accountCards = accounts.map((ac, i) => {
+    const col = ['#7b61ff','#00c9b1','#f093fb'][i];
+    return `<div class="acct-card">
+      <div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0"></div>${ac.name}
+      </div>
+      <div class="phase-toggle">
+        <button class="ptog ${ac.phase==='idv'?'active':''}"
+          onclick="accounts[${i}].phase='idv';renderSim()">Fase 1 · IDV</button>
+        <button class="ptog ${ac.phase==='social'?'active':''}"
+          onclick="accounts[${i}].phase='social';renderSim()">Fase 2 · Social</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);font-weight:300;line-height:1.55">
+        ${ac.phase==='idv'
+          ? `IDV + Manual de Marca<br><span style="color:var(--text);font-weight:600">~${f1(FASE_IDV_H)}h</span> <span style="color:var(--muted)">(pontual · Estratégica/Complexa)</span>`
+          : `Posts recorrentes/mês<br><span style="color:var(--text);font-weight:600">~${f1(FASE_SOCIAL_H)}h/mês</span> <span style="color:var(--muted)">(Baixa/Média)</span>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  const f1H = accounts.filter(a=>a.phase==='idv').length * FASE_IDV_H;
+  const f2H = accounts.filter(a=>a.phase==='social').length * FASE_SOCIAL_H;
+  const extra = f1H + f2H + MANUT_SITE_H;
+  const remaining = availH - extra;
+  const newCapPct = clp((m.used + extra) / m.cap * 100, 0, 999);
+
+  let sc, si, sm;
+  if (newCapPct < 40)       { sc='var(--green)'; si='✅'; sm='Time absorve com folga'; }
+  else if (newCapPct < 65)  { sc='var(--amber)'; si='🟡'; sm='Confortável — monitorar'; }
+  else if (newCapPct < 85)  { sc='var(--amber)'; si='⚠️'; sm='Próximo do limite — considere contratar'; }
+  else                       { sc='var(--red)';   si='🚨'; sm='Acima da capacidade — contratar antes de assumir'; }
+
+  const nFase1 = accounts.filter(a=>a.phase==='idv').length;
+  const camileWarn = nFase1 >= 2
+    ? `<div style="background:rgba(255,184,0,.08);color:var(--amber);border:1px solid rgba(255,184,0,.2);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:12px;font-weight:300;line-height:1.6">
+        ⚠️ <strong style="font-weight:700">${nFase1} contas em Fase 1 simultâneas:</strong>
+        IDV e Manual são executados principalmente pela Camile. Considere escalonar as entregas — não executar os três IDVs em paralelo.
+      </div>` : '';
+
+  el.innerHTML = `
+    <div style="font-size:12px;color:var(--muted);font-weight:300;margin-bottom:16px;line-height:1.6">
+      Configure cada conta em sua fase.
+      <strong style="color:var(--text)">Fase 1</strong> = IDV/Manual, esforço pontual.
+      <strong style="color:var(--text)">Fase 2</strong> = Social, demanda recorrente mensal.
+      Site Spun já está computado como manutenção (~${f1(MANUT_SITE_H)}h/mês).
+    </div>
+    <div class="acct-grid">${accountCards}</div>
+    <div class="sim-result" style="background:${sc}0d;border-color:${sc}33">
+      <div class="sim-res-grid">
+        <div class="sim-res-item"><div class="sri-label">Horas extras / mês</div>
+          <div class="sri-val" style="color:${sc}">${f1(extra)}h</div>
+          <div class="sri-sub">sobre carga atual</div></div>
+        <div class="sim-res-item"><div class="sri-label">Nova % capacidade</div>
+          <div class="sri-val" style="color:${sc}">${f1(newCapPct)}%</div>
+          <div class="sri-sub">hoje: ${f1(m.pct)}%</div></div>
+        <div class="sim-res-item"><div class="sri-label">Margem restante</div>
+          <div class="sri-val" style="color:${remaining>50?'var(--green)':'var(--red)'}">${f1(Math.max(remaining,0))}h</div>
+          <div class="sri-sub">de segurança</div></div>
+        <div class="sim-res-item"><div class="sri-label">Sinal</div>
+          <div class="sri-val" style="font-size:20px">${si}</div>
+          <div class="sri-sub" style="color:${sc};font-weight:500">${sm}</div></div>
+      </div>
+      <div class="sim-warn" style="background:${sc}0d">
+        Fase 1 IDV: <strong>${f1(f1H)}h</strong> ·
+        Fase 2 Social: <strong>${f1(f2H)}h/mês</strong> ·
+        Site Spun: <strong>${f1(MANUT_SITE_H)}h/mês</strong>
+      </div>
+      ${camileWarn}
+    </div>
+  `;
+}
+
+
+// ── AUTO-REPORT GENERATOR ──
+function renderAutoReport(){
+  const wrap = document.getElementById('autoReportWrap');
+  if(!wrap) return;
+
+  const reports = MONTHS.map((m, idx) => {
+    const ap = active(m);
+    const cxKey = ['Janeiro','Fevereiro','Março'][Math.min(idx, 2)];
+    const cxd   = CX_DATA[cxKey] || CX_DATA['Março'];
+
+    const totT = ap.reduce((s,p)=>s+p.t,0);
+    const totA = ap.reduce((s,p)=>s+p.a,0);
+    const wfact = cxd.intensity_factor;
+
+    // main person by hours
+    const byH = [...ap].sort((a,b)=>b.h-a.h);
+    const topP = byH[0];
+
+    // strategic tasks
+    const stratT = cxd.levels['Estratégica']?.t || 0;
+    const stratH = cxd.levels['Estratégica']?.h || 0;
+    const stratDesigners = (cxd.levels['Estratégica']?.designers || []).map(d=>d.n).join(' e ');
+
+    // weighted absorb available
+    const capPP = m.wd * m.hd;
+    const wAvgH = LEVELS.reduce((s,lv)=>s+(cxd.levels[lv]?.pct||0)/100*AVG_H[lv], 0);
+    const totalAbsorb = ap.reduce((s,p)=>{
+      const exec = PC[p.n]?.exec||1;
+      const avail = Math.max(capPP-p.h,0)*exec;
+      return s + (wAvgH>0?Math.floor(avail/wAvgH):0);
+    },0);
+
+    // dominant client
+    const topClient = m.clients?.[0];
+
+    // complexity mix highlight
+    const highComplexPct = ((cxd.levels['Alta']?.pct||0)+(cxd.levels['Complexa']?.pct||0)+(cxd.levels['Estratégica']?.pct||0));
+
+    // previous month comparison
+    const prev = idx > 0 ? MONTHS[idx-1] : null;
+    const prevTotT = prev ? active(prev).reduce((s,p)=>s+p.t,0) : null;
+    const trend = prev
+      ? (m.pct > prev.pct ? `aumento de ${f1(m.pct-prev.pct)}pp` : m.pct < prev.pct ? `queda de ${f1(prev.pct-m.pct)}pp` : 'estável')
+      : null;
+
+    // build paragraphs
+    let body = '';
+
+    // § 1 — overview
+    body += `<p style="margin-bottom:10px">Em <strong>${m.full}</strong>, o time entregou <strong>${totT} tasks</strong> e <strong>${totA} peças</strong>, com uma capacidade bruta de <strong>${f1(m.pct)}%</strong>${trend ? ` (${trend} em relação ao mês anterior)` : ''}. ${ap.map(p=>`<strong>${p.n}</strong> registrou ${f1(p.h)}h`).join(', ')}.`;
+    if(topClient) body += ` O cliente que mais consumiu horas foi <strong>${topClient.name}</strong>, com ${f1(topClient.pct)}% da carga total.`;
+    body += `</p>`;
+
+    // § 2 — intensity
+    body += `<p style="margin-bottom:10px">A intensidade real do mês foi de <strong>×${wfact}</strong> — ou seja, as ${f1(cxd.raw_h)}h brutas equivaleram a ${f1(cxd.weighted_h)}h de esforço ponderado. `;
+    if(stratT > 0){
+      body += `Isso se explica pelas <strong>${stratT} demanda${stratT>1?'s':''} Estratégica${stratT>1?'s':''}</strong>${stratDesigners?' ('+stratDesigners+')':''}, que sozinhas consumiram <strong>${f1(stratH)}h</strong> — ${Math.round(stratH/cxd.raw_h*100)}% de toda a carga registrada. `;
+    } else {
+      body += `O mês não teve demandas Estratégicas, com a carga distribuída principalmente entre tarefas Média e Alta. `;
+    }
+    if(highComplexPct > 25){
+      body += `No total, ${Math.round(highComplexPct)}% das tasks foram de complexidade Alta ou superior.`;
+    } else {
+      body += `O perfil foi predominantemente operacional, com ${Math.round((cxd.levels['Baixa']?.pct||0)+(cxd.levels['Média']?.pct||0))}% das tasks em complexidade Baixa ou Média.`;
+    }
+    body += `</p>`;
+
+    // § 3 — absorb capacity
+    body += `<p style="margin-bottom:0">Com a carga registrada, o time ainda poderia ter absorvido aproximadamente <strong>${totalAbsorb} tasks adicionais</strong> no mix histórico de complexidade. ${totalAbsorb > 30 ? 'Há margem confortável para novas demandas.' : totalAbsorb > 15 ? 'A margem existe, mas requer priorização.' : 'A margem é pequena — novas demandas devem ser avaliadas com critério.'}</p>`;
+
+    return { month: m.full, label: m.label, body, idx };
+  });
+
+  // render as collapsible cards
+  const html = reports.map(r => `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden">
+      <button onclick="toggleReport(${r.idx})" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:transparent;border:none;cursor:pointer;font-family:'Helvena',sans-serif;text-align:left;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0"></div>
+          <span style="font-size:14px;font-weight:700;color:var(--text)">${r.month}</span>
+          <span style="font-size:11px;color:var(--muted);font-weight:300">Leitura automática dos dados</span>
+        </div>
+        <span id="rpt-arrow-${r.idx}" style="font-size:12px;color:var(--muted);transition:transform .2s;flex-shrink:0">▾</span>
+      </button>
+      <div id="rpt-body-${r.idx}" style="display:none;padding:0 20px 18px;border-top:1px solid var(--border)">
+        <div style="padding-top:14px;font-size:13px;color:var(--dim);font-weight:300;line-height:1.75">
+          ${r.body}
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--muted);font-weight:300;font-style:italic">Gerado automaticamente a partir dos dados do dashboard. Revise antes de compartilhar externamente.</div>
+      </div>
+    </div>
+  `).join('');
+
+  wrap.innerHTML = `
+    <div style="font-size:12px;color:var(--muted);font-weight:300;margin-bottom:14px;line-height:1.6">
+      Resumo em linguagem simples de cada mês — útil para quem não lê os números diretamente.
+      Gerado automaticamente com base nos dados carregados.
+    </div>
+    ${html}`;
+}
+
+function toggleReport(idx){
+  const body  = document.getElementById('rpt-body-'+idx);
+  const arrow = document.getElementById('rpt-arrow-'+idx);
+  const open  = body.style.display === 'block';
+  body.style.display  = open ? 'none' : 'block';
+  arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+
 function renderAll(){
   renderTabs();renderKPIs();renderCap();renderPeople();
-  renderDemand();renderHire();renderClients();renderBench();renderTrend();renderRpts();renderDates();
+  renderClients();renderBench();renderTrend();renderFused();renderHire();renderSim();renderRpts();renderAutoReport();renderDates();
 }
 
 renderTicker();renderAll();
