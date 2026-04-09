@@ -410,10 +410,82 @@ input[type=range] { width:100%; accent-color:var(--accent); cursor:pointer }
 .sim-warn { margin-top:12px; font-size:12px; font-weight:300; line-height:1.6;
   padding:10px 14px; border-radius:8px; color:var(--dim) }
 
+
+/* ── PIZZA POR DESIGNER ── */
+.pizza-row { display:flex; flex-wrap:wrap; gap:20px; margin-top:12px; align-items:flex-start }
+.pizza-item { display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0 }
+.pizza-wrap { position:relative; width:72px; height:72px; cursor:default }
+.pizza-wrap svg { display:block; overflow:visible }
+.pizza-slice { transition:transform 0.22s cubic-bezier(.34,1.56,.64,1), filter 0.18s; transform-origin:center; }
+.pizza-slice:hover { transform:scale(1.12); filter:brightness(1.25) drop-shadow(0 0 6px currentColor) }
+.pizza-center { pointer-events:none }
+.pizza-label { font-size:10px; font-weight:600; color:var(--dim); font-family:'Helvena',sans-serif; text-align:center; line-height:1.3 }
+.pizza-label span { display:block; font-size:9px; font-weight:300; color:var(--muted) }
+.pizza-tooltip-box {
+  position:fixed; z-index:9999; pointer-events:none;
+  background:#0d0e12; border:1px solid rgba(255,255,255,0.15);
+  color:#ededf0; font-size:11px; font-weight:300; line-height:1.6;
+  padding:8px 12px; border-radius:8px; white-space:nowrap;
+  box-shadow:0 6px 20px rgba(0,0,0,0.6);
+  opacity:0; transition:opacity .12s;
+}
+.pizza-tooltip-box.show { opacity:1 }
+
+
+/* ── DESIGNER WHEEL SELECTOR ── */
+.wheel-section { padding:20px 24px 24px }
+.wheel-tabs { display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap }
+.wheel-tab {
+  padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600;
+  font-family:'Helvena',sans-serif; cursor:pointer; border:1px solid var(--border2);
+  background:var(--card2); color:var(--dim); transition:all .18s;
+  display:flex; align-items:center; gap:8px;
+}
+.wheel-tab:hover { color:var(--text); border-color:var(--border2); }
+.wheel-tab.active { color:#fff; border-color:transparent; }
+.wheel-tab .wt-av {
+  width:22px; height:22px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:700; color:#fff; flex-shrink:0;
+}
+.wheel-content { display:grid; grid-template-columns:220px 1fr; gap:28px; align-items:start }
+@media(max-width:700px){ .wheel-content { grid-template-columns:1fr } }
+
+/* the donut wheel */
+.wheel-donut-wrap { display:flex; flex-direction:column; align-items:center; gap:0; position:relative }
+.wheel-center-info { text-align:center; margin-top:-4px }
+.wheel-total-num { font-size:32px; font-weight:800; letter-spacing:-0.02em; line-height:1; color:var(--text) }
+.wheel-total-lbl { font-size:11px; color:var(--muted); font-weight:300; margin-top:2px }
+.wheel-svg { overflow:visible; display:block }
+.wheel-arc {
+  transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), filter 0.18s, opacity 0.18s;
+  transform-origin: center;
+  cursor:default;
+}
+.wheel-arc:hover {
+  transform: scale(1.07);
+  filter: brightness(1.3) drop-shadow(0 0 8px currentColor);
+}
+.wheel-legend { display:flex; flex-direction:column; gap:10px }
+.wleg-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; background:var(--card2);
+  border-radius:9px; border:1px solid var(--border);
+  transition: border-color .15s, background .15s;
+  cursor:default;
+}
+.wleg-item:hover { border-color:var(--border2); background:var(--card); }
+.wleg-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0 }
+.wleg-name { font-size:13px; font-weight:600; color:var(--text); flex:1 }
+.wleg-tasks { font-size:22px; font-weight:800; letter-spacing:-0.02em; color:var(--text); font-family:'Helvena',sans-serif }
+.wleg-pct { font-size:11px; font-weight:400; border-radius:20px; padding:2px 8px; font-family:'Helvena',sans-serif }
+.wleg-h { font-size:11px; color:var(--muted); font-weight:300; margin-left:auto }
+
 </style>
 </head>
 <body>
 <div id="tt-global"></div>
+<div class="pizza-tooltip-box" id="pizza-tt"></div>
 <script>
 (function(){
   const box = document.getElementById('tt-global');
@@ -1132,15 +1204,240 @@ const CX_DATA = {
     levels:{ Baixa:{t:14,pct:23.7,h:3.4,designers:[{n:'Camile',t:6,h:2.2},{n:'Júlia',t:5,h:1.0},{n:'Carol',t:3,h:0.3}]}, Média:{t:30,pct:50.8,h:20.5,designers:[{n:'Camile',t:8,h:5.9},{n:'Júlia',t:14,h:8.4},{n:'Carol',t:6,h:5.9}]}, Alta:{t:10,pct:16.9,h:11.8,designers:[{n:'Camile',t:3,h:9.3},{n:'Júlia',t:1,h:0.5},{n:'Carol',t:6,h:1.9}]}, Complexa:{t:3,pct:5.1,h:5.9,designers:[{n:'Camile',t:1,h:5.1},{n:'Júlia',t:1,h:0.7},{n:'Carol',t:1,h:0.1}]}, Estratégica:{t:1,pct:1.7,h:8.0,designers:[{n:'Camile',t:1,h:8.0}]} }},
   'Fevereiro': { total:46,  raw_h:69.9,  weighted_h:194.8, avg_w:1.87, intensity_factor:2.8,
     levels:{ Baixa:{t:18,pct:39.1,h:12.2,designers:[{n:'Camile',t:8,h:5.6},{n:'Júlia',t:10,h:6.6}]}, Média:{t:20,pct:43.5,h:25.8,designers:[{n:'Camile',t:10,h:14.8},{n:'Júlia',t:10,h:11.0}]}, Alta:{t:6,pct:13.0,h:14.2,designers:[{n:'Camile',t:3,h:7.4},{n:'Júlia',t:3,h:6.8}]}, Complexa:{t:0,pct:0,h:0,designers:[]}, Estratégica:{t:2,pct:4.3,h:17.6,designers:[{n:'Camile',t:2,h:17.6}]} }},
-  'Março':     { total:64,  raw_h:155.5, weighted_h:532.4, avg_w:1.94, intensity_factor:3.4,
-    levels:{ Baixa:{t:26,pct:40.6,h:9.7,designers:[{n:'Camile',t:21,h:6.2},{n:'Júlia',t:5,h:4.8}]}, Média:{t:20,pct:31.2,h:46.8,designers:[{n:'Camile',t:10,h:23.0},{n:'Júlia',t:10,h:26.1}]}, Alta:{t:9,pct:14.1,h:25.8,designers:[{n:'Camile',t:4,h:12.6},{n:'Júlia',t:4,h:13.2}]}, Complexa:{t:2,pct:3.1,h:10.7,designers:[{n:'Camile',t:1,h:6.7},{n:'Júlia',t:2,h:10.7}]}, Estratégica:{t:3,pct:4.7,h:61.3,designers:[{n:'Camile',t:2,h:56.3},{n:'Júlia',t:1,h:5.0}]} }},
+  'Março':     { total:62,  raw_h:155.5, weighted_h:528.8, avg_w:1.94, intensity_factor:3.4,
+    // ✅ dados corrigidos com CSV atualizado (09/04/2026) — inclui campo complexidade em todas as tasks
+    levels:{ Baixa:{t:27,pct:43.5,h:9.7,designers:[{n:'Camile',t:21,h:6.2},{n:'Júlia',t:5,h:4.8},{n:'Mariana',t:3,h:0.0}]}, Média:{t:21,pct:33.9,h:52.5,designers:[{n:'Camile',t:10,h:23.0},{n:'Júlia',t:12,h:31.8}]}, Alta:{t:7,pct:11.3,h:20.9,designers:[{n:'Camile',t:5,h:13.4},{n:'Júlia',t:2,h:7.5}]}, Complexa:{t:2,pct:3.2,h:10.7,designers:[{n:'Camile',t:1,h:6.7},{n:'Júlia',t:2,h:10.7}]}, Estratégica:{t:5,pct:8.1,h:61.7,designers:[{n:'Camile',t:4,h:56.7},{n:'Júlia',t:1,h:5.0}]} }},
 };
 const AVG_H   = { Baixa:0.44, Média:1.33, Alta:2.07, Complexa:3.32, Estratégica:14.49 };
+
+// Per-designer complexity breakdown per month — for the wheel selector
+// Format: { 'MêsAno': { 'Designer': { total_t, total_h, cx: { Level: {t,h} } } } }
+const DESIGNER_CX = {
+  'Janeiro': {
+    'Camile': { total_t:20, total_h:30.9, cx:{ Baixa:{t:6,h:2.2}, Média:{t:8,h:5.9}, Alta:{t:3,h:9.3}, Complexa:{t:1,h:5.1}, Estratégica:{t:1,h:8.0} }},
+    'Júlia':  { total_t:20, total_h:11.9, cx:{ Baixa:{t:5,h:1.0}, Média:{t:14,h:8.4}, Alta:{t:1,h:0.5}, Complexa:{t:1,h:0.7} }},
+    'Carol':  { total_t:16, total_h:8.2,  cx:{ Baixa:{t:3,h:0.3}, Média:{t:6,h:5.9}, Alta:{t:6,h:1.9}, Complexa:{t:1,h:0.1} }},
+  },
+  'Fevereiro': {
+    'Camile': { total_t:23, total_h:44.9, cx:{ Baixa:{t:8,h:5.6}, Média:{t:10,h:14.8}, Alta:{t:3,h:7.4}, Estratégica:{t:2,h:17.6} }},
+    'Júlia':  { total_t:23, total_h:24.4, cx:{ Baixa:{t:10,h:6.6}, Média:{t:10,h:11.0}, Alta:{t:3,h:6.8} }},
+  },
+  'Março': {
+    'Camile':  { total_t:41, total_h:106.0, cx:{ Baixa:{t:21,h:6.2}, Média:{t:10,h:23.0}, Alta:{t:5,h:13.4}, Complexa:{t:1,h:6.7}, Estratégica:{t:4,h:56.7} }},
+    'Júlia':   { total_t:22, total_h:59.8,  cx:{ Baixa:{t:5,h:4.8},  Média:{t:12,h:31.8}, Alta:{t:2,h:7.5},  Complexa:{t:2,h:10.7}, Estratégica:{t:1,h:5.0}  }},
+    'Mariana': { total_t:3,  total_h:0.0,   cx:{ Baixa:{t:3,h:0.0} }},
+  },
+};
 const CX_COLORS = { Baixa:'#00d68f', Média:'#7b61ff', Alta:'#ffb800', Complexa:'#ff4d6a', Estratégica:'#f093fb' };
 const LEVELS  = ['Baixa','Média','Alta','Complexa','Estratégica'];
 const CX_MONTHS = ['Janeiro','Fevereiro','Março'];
 
 // ── FUSED SECTION: Absorção + Complexidade ──
+
+function buildPizzaSVG(ld, lvColor) {
+  // Build a donut/pizza chart for one complexity level, sliced by designer hours
+  var designers = (ld.designers || []).filter(function(d){ return d.h > 0; });
+  if(designers.length === 0) return '';
+
+  var total = designers.reduce(function(s,d){ return s + d.h; }, 0);
+  if(total <= 0) return '';
+
+  var cx = 36, cy = 36, r = 30, inner = 14;
+  var angle = -Math.PI / 2; // start top
+  var paths = '';
+
+  designers.forEach(function(d, i) {
+    var slice  = (d.h / total) * Math.PI * 2;
+    var a1     = angle;
+    var a2     = angle + slice;
+    var x1o    = cx + r * Math.cos(a1), y1o = cy + r * Math.sin(a1);
+    var x2o    = cx + r * Math.cos(a2), y2o = cy + r * Math.sin(a2);
+    var x1i    = cx + inner * Math.cos(a1), y1i = cy + inner * Math.sin(a1);
+    var x2i    = cx + inner * Math.cos(a2), y2i = cy + inner * Math.sin(a2);
+    var lg     = slice > Math.PI ? 1 : 0;
+    var dc     = (PC[d.n] && PC[d.n].color) || '#9ca3af';
+    var pct    = Math.round(d.h / total * 100);
+    var tip    = d.n + ': ' + f1(d.h) + 'h (' + pct + '%)';
+
+    // donut arc path
+    var pathD = 'M' + x1i.toFixed(2) + ',' + y1i.toFixed(2)
+      + ' L' + x1o.toFixed(2) + ',' + y1o.toFixed(2)
+      + ' A' + r + ',' + r + ' 0 ' + lg + ',1 ' + x2o.toFixed(2) + ',' + y2o.toFixed(2)
+      + ' L' + x2i.toFixed(2) + ',' + y2i.toFixed(2)
+      + ' A' + inner + ',' + inner + ' 0 ' + lg + ',0 ' + x1i.toFixed(2) + ',' + y1i.toFixed(2)
+      + ' Z';
+
+    paths += '<path class="pizza-slice" d="' + pathD + '" fill="' + dc + '" opacity="0.88" '
+      + 'onmouseenter="showPizzaTT(event,\'' + tip.replace(/'/g, '&#39;') + '\',\'' + dc + '\')" '
+      + 'onmouseleave="hidePizzaTT()">'
+      + '<title>' + tip + '</title>'
+      + '</path>';
+
+    angle += slice;
+  });
+
+  // center label: total hours
+  var svg = '<svg width="72" height="72" viewBox="0 0 72 72">'
+    + paths
+    + '<circle cx="' + cx + '" cy="' + cy + '" r="' + inner + '" fill="var(--card2)" class="pizza-center"/>'
+    + '<text x="' + cx + '" y="' + (cy+3) + '" text-anchor="middle" font-size="8" font-weight="700" '
+      + 'fill="var(--text)" font-family="Helvena,sans-serif">' + f1(total) + 'h</text>'
+    + '</svg>';
+  return svg;
+}
+
+function showPizzaTT(e, text, color) {
+  var box = document.getElementById('pizza-tt');
+  if(!box) return;
+  box.innerHTML = '<span style="color:' + color + ';font-weight:700">●</span> ' + text;
+  box.classList.add('show');
+  movePizzaTT(e);
+}
+
+function movePizzaTT(e) {
+  var box = document.getElementById('pizza-tt');
+  if(!box || !box.classList.contains('show')) return;
+  var x = e.clientX, y = e.clientY - 40;
+  if(y < 8) y = e.clientY + 16;
+  box.style.left = (x - box.offsetWidth/2) + 'px';
+  box.style.top  = y + 'px';
+}
+
+function hidePizzaTT() {
+  var box = document.getElementById('pizza-tt');
+  if(box) box.classList.remove('show');
+}
+
+document.addEventListener('mousemove', function(e){
+  var box = document.getElementById('pizza-tt');
+  if(box && box.classList.contains('show')) movePizzaTT(e);
+});
+
+
+
+// ── WHEEL STATE ──
+var _wheelMonth    = 'Março';
+var _wheelDesigner = null;
+
+function initWheel(mname) {
+  _wheelMonth    = mname;
+  var dcx        = DESIGNER_CX[mname] || {};
+  var designers  = Object.keys(dcx);
+  _wheelDesigner = designers[0] || null;
+  renderWheelTabs(designers, dcx);
+  renderWheel();
+}
+
+function renderWheelTabs(designers, dcx) {
+  var tabs = document.getElementById('wheelTabs');
+  if(!tabs) return;
+  var all = [{ key:'__all__', label:'Time', color:'#7b61ff' }].concat(
+    designers.map(function(d){ return { key:d, label:d, color:(PC[d]&&PC[d].color)||'#9ca3af' }; })
+  );
+  tabs.innerHTML = all.map(function(t) {
+    var active = (t.key==='__all__' && !_wheelDesigner) || (t.key===_wheelDesigner);
+    var av = '<div class="wt-av" style="background:linear-gradient(135deg,'+t.color+','+t.color+'88)">'+t.label.slice(0,2).toUpperCase()+'</div>';
+    return '<button class="wheel-tab'+(active?' active':'')+'" '
+      +'style="'+(active?'background:'+t.color+'22;border-color:'+t.color+'55;color:var(--text)':'')+'" '
+      +'onclick="selectWheelDesigner(\''+t.key+'\')">'
+      +av+t.label+'</button>';
+  }).join('');
+}
+
+function selectWheelDesigner(key) {
+  _wheelDesigner = (key==='__all__') ? null : key;
+  var dcx = DESIGNER_CX[_wheelMonth] || {};
+  renderWheelTabs(Object.keys(dcx), dcx);
+  renderWheel();
+}
+
+function renderWheel() {
+  var svg    = document.getElementById('wheelSvg');
+  var legend = document.getElementById('wheelLegend');
+  var numEl  = document.getElementById('wheelTotalNum');
+  if(!svg || !legend) return;
+
+  var dcx = DESIGNER_CX[_wheelMonth] || {};
+  var cxSlices = {}, totalTasks = 0;
+
+  if(_wheelDesigner && dcx[_wheelDesigner]) {
+    var d = dcx[_wheelDesigner];
+    totalTasks = d.total_t;
+    cxSlices   = d.cx || {};
+  } else {
+    Object.values(dcx).forEach(function(d) {
+      totalTasks += d.total_t;
+      Object.entries(d.cx||{}).forEach(function(pair) {
+        var lv=pair[0], val=pair[1];
+        if(!cxSlices[lv]) cxSlices[lv]={t:0,h:0};
+        cxSlices[lv].t += val.t;
+        cxSlices[lv].h += val.h;
+      });
+    });
+  }
+
+  if(numEl) numEl.textContent = totalTasks;
+
+  var RINGS = ['Baixa','Média','Alta','Complexa','Estratégica'];
+  var cx=100, cy=100, rOuter=92, rInner=28, gap=5;
+  var ringW = (rOuter - rInner - gap*(RINGS.length-1)) / RINGS.length;
+  var paths = '';
+
+  RINGS.forEach(function(lv, ri) {
+    var ro  = rOuter - ri*(ringW+gap);
+    var ri2 = ro - ringW;
+    var col = CX_COLORS[lv] || '#9ca3af';
+    var sl  = cxSlices[lv];
+    var pct = (sl && totalTasks>0) ? sl.t/totalTasks : 0;
+    // bg track
+    paths += buildWheelArc(cx,cy,ro,ri2,0,0.9999,col,0.1,'','','');
+    // filled
+    if(pct>0.005) {
+      var tip = lv+': '+(sl?sl.t:0)+' tasks ('+Math.round(pct*100)+'%)';
+      paths += buildWheelArc(cx,cy,ro,ri2,0,pct,col,1,lv,tip,col);
+    }
+  });
+
+  svg.innerHTML = paths
+    + '<circle cx="100" cy="100" r="28" fill="var(--card2)"/>'
+    + '<text x="100" y="96" text-anchor="middle" font-size="11" font-weight="300" fill="var(--muted)" font-family="Helvena,sans-serif">tasks</text>'
+    + '<text x="100" y="114" text-anchor="middle" font-size="24" font-weight="800" fill="var(--text)" font-family="Helvena,sans-serif">'+totalTasks+'</text>';
+
+  legend.innerHTML = RINGS.map(function(lv) {
+    var sl  = cxSlices[lv];
+    var t   = sl ? sl.t : 0;
+    var h   = sl ? sl.h : 0;
+    var pct = totalTasks>0 ? Math.round(t/totalTasks*100) : 0;
+    var col = CX_COLORS[lv] || '#9ca3af';
+    return '<div class="wleg-item">'
+      +'<div class="wleg-dot" style="background:'+col+'"></div>'
+      +'<div class="wleg-name">'+lv+'</div>'
+      +'<div class="wleg-tasks" style="color:'+col+'">'+t+'</div>'
+      +'<div class="wleg-pct" style="background:'+col+'18;color:'+col+'">'+pct+'%</div>'
+      +'<div class="wleg-h">'+f1(h)+'h</div>'
+      +'</div>';
+  }).join('');
+}
+
+function buildWheelArc(cx, cy, rOut, rIn, startPct, endPct, col, opacity, lv, tip, tipCol) {
+  var TAU = Math.PI*2;
+  var s   = startPct*TAU - Math.PI/2;
+  var e   = endPct  *TAU - Math.PI/2;
+  if(e-s > TAU-0.001) e = s+TAU-0.001;
+  var x1o = cx+rOut*Math.cos(s), y1o = cy+rOut*Math.sin(s);
+  var x2o = cx+rOut*Math.cos(e), y2o = cy+rOut*Math.sin(e);
+  var x1i = cx+rIn *Math.cos(e), y1i = cy+rIn *Math.sin(e);
+  var x2i = cx+rIn *Math.cos(s), y2i = cy+rIn *Math.sin(s);
+  var lg  = (e-s>Math.PI) ? 1 : 0;
+  var d   = 'M'+x1o.toFixed(2)+','+y1o.toFixed(2)
+    +' A'+rOut+','+rOut+' 0 '+lg+',1 '+x2o.toFixed(2)+','+y2o.toFixed(2)
+    +' L'+x1i.toFixed(2)+','+y1i.toFixed(2)
+    +' A'+rIn+','+rIn+' 0 '+lg+',0 '+x2i.toFixed(2)+','+y2i.toFixed(2)+' Z';
+  var hover = tip ? ' class="wheel-arc" onmouseenter="showPizzaTT(event,\''+tip.replace(/'/g,'&#39;')+'\',\''+tipCol+'\')" onmouseleave="hidePizzaTT()"' : '';
+  return '<path'+hover+' d="'+d+'" fill="'+col+'" opacity="'+opacity+'"/>';
+}
+
+
 function renderFused() {
   const m  = MONTHS[curIdx];
   const ap = active(m);
@@ -1256,7 +1553,12 @@ function renderFused() {
           <div class="level-bar-fill" style="width:${barW}%;background:${col}"></div>
         </div>
       </div>
-      ${dChips ? `<div class="designers-row">${dChips}</div>` : ''}
+      ${(function(){
+        var pizza = buildPizzaSVG(ld, col);
+        var pizzaEl = pizza ? '<div class="pizza-item"><div class="pizza-wrap">' + pizza + '</div><div class="pizza-label">Horas por designer</div></div>' : '';
+        var chipsEl = dChips ? '<div style="flex:1;display:flex;flex-wrap:wrap;gap:6px;align-items:center">' + dChips + '</div>' : '';
+        return (pizzaEl || chipsEl) ? '<div class="pizza-row" style="margin-top:12px">' + pizzaEl + chipsEl + '</div>' : '';
+      })()}
     </div>`;
   }).join('');
 
@@ -1357,24 +1659,26 @@ function renderFused() {
     <div class="fused-divider"></div>
 
     <div class="cx-section">
-      <div class="cx-section-title">
-        Complexidade das entregas em ${cxKey}
+      <div class="cx-section-title" style="margin-bottom:4px">Complexidade em ${cxKey}</div>
+      <div class="cx-section-sub">Selecione um designer para ver a distribuição individual. Passe o mouse sobre os arcos para detalhes.</div>
+      <div class="wheel-tabs" id="wheelTabs"></div>
+      <div class="wheel-content">
+        <div class="wheel-donut-wrap">
+          <svg id="wheelSvg" class="wheel-svg" width="200" height="200" viewBox="0 0 200 200"></svg>
+        </div>
+        <div class="wheel-legend" id="wheelLegend"></div>
       </div>
-      <div class="cx-section-sub">
-        Distribuição real por nível e quem trabalhou em cada tipo.
-        Estratégica e Complexa têm baixo volume mas concentram a maior parte das horas.
-      </div>
-      <div class="levels-grid">${levelsHTML}</div>
-
-      <div class="line-chart-wrap">
+      <div class="line-chart-wrap" style="margin-top:24px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
           <div class="lc-title">Tendência de complexidade — Jan a Mar</div>
           <div style="display:flex;flex-wrap:wrap;gap:12px">${lineLegend}</div>
         </div>
         <div class="lc-svg-wrap">${svgContent}</div>
       </div>
-    </div>
-  `;
+    </div>  `;
+  // init wheel with current month cx data
+  var _wMonth = ['Janeiro','Fevereiro','Março'][Math.min(curIdx,2)];
+  initWheel(_wMonth);
 }
 
 // ── SIM ──
