@@ -481,6 +481,50 @@ input[type=range] { width:100%; accent-color:var(--accent); cursor:pointer }
 .wleg-pct { font-size:11px; font-weight:400; border-radius:20px; padding:2px 8px; font-family:'Helvena',sans-serif }
 .wleg-h { font-size:11px; color:var(--muted); font-weight:300; margin-left:auto }
 
+
+.fmt-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+.fmt-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:18px}
+@media(max-width:800px){.fmt-grid{grid-template-columns:1fr}}
+.fmt-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);transition:background .12s}
+.fmt-row:hover{background:var(--card2)}
+.fmt-row:last-child{border-bottom:none}
+.fmt-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.fmt-name{font-size:13px;font-weight:600;color:var(--text);width:100px;flex-shrink:0}
+.fmt-bar-wrap{flex:1;min-width:60px}
+.fmt-bar-track{background:var(--card2);border-radius:100px;height:6px;overflow:hidden}
+.fmt-bar-fill{height:100%;border-radius:100px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.fmt-tasks{font-size:13px;font-weight:700;color:var(--text);width:32px;text-align:right;flex-shrink:0}
+.fmt-avg{font-size:11px;color:var(--muted);width:54px;text-align:right;flex-shrink:0;font-weight:300}
+.fmt-hours{font-size:11px;color:var(--dim);width:46px;text-align:right;flex-shrink:0;font-weight:500}
+.fmt-trend{display:flex;flex-direction:column;gap:6px}
+.fmt-trend-item{display:flex;align-items:center;gap:8px}
+.fmt-trend-name{font-size:12px;font-weight:500;color:var(--dim);width:85px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fmt-trend-bars{display:flex;align-items:flex-end;gap:3px;flex:1;height:28px}
+.fmt-trend-bar{flex:1;border-radius:3px 3px 0 0;min-height:2px;position:relative;cursor:default;transition:opacity .15s}
+.fmt-trend-bar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border2);color:var(--text);font-size:10px;padding:3px 7px;border-radius:4px;white-space:nowrap;font-family:'Helvena',sans-serif;font-weight:500;z-index:20}
+.staff-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+.staff-table{width:100%;border-collapse:collapse;margin-top:16px}
+.staff-table th{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)}
+.staff-table td{font-size:13px;font-weight:400;color:var(--dim);padding:10px 12px;border-bottom:1px solid var(--border)}
+.staff-table tr:hover td{background:var(--card2)}
+.staff-table .st-fmt{font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.staff-table .st-num{font-weight:700;color:var(--text);font-family:'Helvena',sans-serif}
+.staff-table .st-bar{background:var(--card2);border-radius:100px;height:5px;overflow:hidden;min-width:60px}
+.staff-table .st-bar-fill{height:100%;border-radius:100px}
+
+
+.lc-controls { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:14px }
+.lc-ctrl-btn { padding:6px 12px; border-radius:6px; font-size:11px; font-weight:500;
+  font-family:'Helvena',sans-serif; cursor:pointer; border:1px solid var(--border2);
+  background:transparent; color:var(--muted); transition:all .15s; display:flex;
+  align-items:center; gap:5px }
+.lc-ctrl-btn:hover { color:var(--text); border-color:var(--border2) }
+.lc-ctrl-btn.active { color:#fff; border-color:transparent }
+.lc-ctrl-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0 }
+.lc-chart-area { background:var(--card); border-radius:10px; padding:16px 12px 8px; position:relative }
+.lc-point { cursor:default; transition:r 0.15s }
+.lc-point:hover { r:6 }
+
 </style>
 </head>
 <body>
@@ -605,18 +649,26 @@ input[type=range] { width:100%; accent-color:var(--accent); cursor:pointer }
 
       <div style="margin-top:14px" id="hireSignal"></div>
 
-      <div class="slabel">Simulador de Cenários</div>
-      <div class="sim-wrap" id="simWrap"></div>
-
-
       <div class="slabel">Distribuição de Horas por Cliente</div>
       <div class="client-wrap" id="clientWrap"></div>
+
+
+      <div class="slabel">Distribuição por Formato de Entrega</div>
+      <div class="fmt-wrap" id="fmtWrap"></div>
 
       <div class="slabel">Benchmark de Ritmo por Formato</div>
       <div class="bench-wrap" id="benchWrap"></div>
 
+      <div class="slabel">Limite Operacional — Projeção de Contratação</div>
+      <div class="staff-wrap" id="staffLimitWrap"></div>
+
       <div class="slabel">Evolução Mensal</div>
       <div class="card" style="padding:24px" id="trendCard"></div>
+
+      <div class="slabel">Simulador de Cenários</div>
+      <div class="sim-wrap" id="simWrap"></div>
+
+
 
       <div class="slabel">Importar CSV do ClickUp</div>
       <div class="up-wrap">
@@ -659,7 +711,9 @@ input[type=range] { width:100%; accent-color:var(--accent); cursor:pointer }
 const PC = {
   'Camile':   { color:'#7b61ff', exec:0.70, role:'Design Lead · Sênior + Gestão', mgr:true,   pontual:false },
   'Júlia':    { color:'#00c9b1', exec:1.00, role:'Designer Júnior',               mgr:false,  pontual:false },
-  'Carol':    { color:'#ff4d6a', exec:1.00, role:'Designer',                      mgr:false,  pontual:false },
+  // Carol: histórico Jan/Fev — saiu do time
+  'Carol':    { color:'#ff4d6a', exec:1.00, role:'Designer',                      mgr:false,  pontual:true  },
+  // Mariana: apoio pontual esporádico
   'Mariana':  { color:'#ffb800', exec:1.00, role:'Apoio Pontual',                 mgr:false,  pontual:true  },
 };
 
@@ -674,45 +728,48 @@ let MONTHS = [
   {
     id:'jan26', label:'Jan', full:'Janeiro 2026',
     wd:22, hd:8,
-    // ← valores do RESUMO DO MÊS (planilha-fonte, mais completa que o export)
-    cap:528, used:98.1, avail:430.0, pct:18.6, cost:835.81,
+    // Cap: Camile + Júlia + Carol (Carol estava no time em jan/fev)
+    // used: horas reais da planilha-fonte (mais completa que o export parcial)
+    cap:528, used:98.1, avail:429.9, pct:18.6, cost:835.81,
     clients:[
-      {name:'LOS',       h:26.6, pct:52.1},
-      {name:'Spun Mídia',h:12.1, pct:23.8},
-      {name:'SPUNmers',  h:10.9, pct:21.3},
-      {name:'João',      h:1.3,  pct:2.5},
-      {name:'R6',        h:0.1,  pct:0.3},
+      {name:'LOS',        h:26.6, pct:52.1},
+      {name:'Spun Mídia', h:12.1, pct:23.8},
+      {name:'SPUNmers',   h:10.9, pct:21.3},
+      {name:'João',       h:1.3,  pct:2.5},
+      {name:'R6',         h:0.1,  pct:0.3},
     ],
-    bench:{ 'Carrossel':88,'Story':18,'Estático':14,'Vídeo':37,'Apresentação':153,'Capa Instagram':9,'Evento':307 },
+    bench:{'Carrossel':88,'Story':18,'Estático':14,'Vídeo':37,'Apresentação':153,'Capa Redes':9,'Evento':307},
     people:[
-      {n:'Camile', t:20, a:79,  h:30.9, avgh:1.5, hr:25.00, cpt:38.56, cpa:9.76 },
-      {n:'Júlia',  t:20, a:59,  h:11.9, avgh:0.6, hr:9.55,  cpt:28.17, cpa:1.93 },
-      {n:'Carol',  t:16, a:32,  h:8.2,  avgh:0.5, hr:9.55,  cpt:19.10, cpa:2.45 },
+      {n:'Camile', t:20, a:79, h:30.9, avgh:1.5, hr:25.00, cpt:38.56, cpa:9.76},
+      {n:'Júlia',  t:20, a:59, h:11.9, avgh:0.6, hr:9.55,  cpt:28.17, cpa:1.93},
+      {n:'Carol',  t:16, a:32, h:8.2,  avgh:0.5, hr:9.55,  cpt:19.10, cpa:2.45},
     ]
   },
   {
     id:'fev26', label:'Fev', full:'Fevereiro 2026',
     wd:20, hd:8,
-    cap:480, used:109.9, avail:370.1, pct:22.9, cost:835.81,
+    // Cap: Camile + Júlia (2 × 20d × 8h = 320h)
+    cap:320, used:69.3, avail:250.7, pct:21.7, cost:835.81,
     clients:[
-      {name:'SPUN',      h:40.4, pct:58.3},
-      {name:'WIBR',      h:13.7, pct:19.7},
-      {name:'SPUNmers',  h:10.3, pct:14.9},
-      {name:'João',      h:2.6,  pct:3.7},
-      {name:'EZOR',      h:1.2,  pct:1.7},
-      {name:'LOS',       h:1.0,  pct:1.5},
+      {name:'SPUN',     h:40.4, pct:58.3},
+      {name:'WIBR',     h:13.7, pct:19.7},
+      {name:'SPUNmers', h:10.3, pct:14.9},
+      {name:'João',     h:2.6,  pct:3.7},
+      {name:'EZOR',     h:1.2,  pct:1.7},
+      {name:'LOS',      h:1.0,  pct:1.5},
     ],
-    bench:{ 'Carrossel':112,'Story':28,'Estático':22,'Vídeo':50,'Apresentação':185,'KV':819 },
+    bench:{'Carrossel':112,'Story':28,'Estático':22,'Vídeo':50,'Apresentação':185,'KV':819},
     people:[
-      {n:'Camile', t:23, a:77,  h:44.9, avgh:2.0, hr:25.00, cpt:48.82, cpa:14.58},
-      {n:'Júlia',  t:23, a:65,  h:24.4, avgh:1.1, hr:9.55,  cpt:26.99, cpa:3.58 },
+      {n:'Camile', t:23, a:77, h:44.9, avgh:2.0, hr:25.00, cpt:48.82, cpa:14.58},
+      {n:'Júlia',  t:23, a:65, h:24.4, avgh:1.1, hr:9.55,  cpt:26.99, cpa:3.58},
     ]
   },
   {
     id:'mar26', label:'Mar', full:'Março 2026',
     wd:21, hd:8,
-    // ← março não tem resumo na planilha, calculado do CSV (completo)
-    cap:504, used:165.8, avail:338.2, pct:32.9, cost:3221.09,
+    // Cap: Camile + Júlia (2 × 21d × 8h = 336h). Mariana era apoio pontual.
+    // Feriados: Dia da Mulher (day off) + atestado Júlia 3 dias (refletido nas horas reais).
+    cap:336, used:165.8, avail:170.2, pct:49.3, cost:3221.09,
     clients:[
       {name:'SPUN',     h:112.8, pct:72.7},
       {name:'SPUNmers', h:36.7,  pct:23.6},
@@ -720,11 +777,33 @@ let MONTHS = [
       {name:'João',     h:0.3,   pct:0.2},
       {name:'KAKAVEL',  h:0.3,   pct:0.2},
     ],
-    bench:{ 'Carrossel':143,'Story':60,'Estático':29,'Vídeo':225,'Apresentação':180,'Motion':135,'IDV':204,'Impressão':531,'Site/UI':2292 },
+    bench:{'Carrossel':143,'Story':60,'Estático':29,'Vídeo':225,'Apresentação':180,'Motion':135,'IDV':204,'Impressão':531,'UI/UX':2292},
     people:[
-      {n:'Camile',  t:41, a:157, h:106.0, avgh:2.6, hr:25.00, cpt:64.63, cpa:16.88},
-      {n:'Júlia',   t:22, a:120, h:59.8,  avgh:2.7, hr:9.55,  cpt:25.96, cpa:4.76 },
-      {n:'Mariana', t:3,  a:3,   h:0.0,   avgh:0.0, hr:9.55,  cpt:0.00,  cpa:0.00 },
+      {n:'Camile', t:41, a:157, h:106.0, avgh:2.6, hr:25.00, cpt:64.63, cpa:16.88},
+      {n:'Júlia',  t:22, a:120, h:59.8,  avgh:2.7, hr:9.55,  cpt:25.96, cpa:4.76},
+    ]
+  },
+  {
+    id:'abr26', label:'Abr', full:'Abril 2026',
+    wd:20, hd:8,
+    // Cap: Camile + Júlia (2 × 20d × 8h = 320h). Feriados: Sexta Santa 18/4 + Tiradentes 21/4.
+    cap:320, used:118.4, avail:201.6, pct:37.0, cost:2226.93,
+    clients:[
+      {name:'SPUN',      h:45.0, pct:40.4},
+      {name:'SPUNmers',  h:30.4, pct:27.2},
+      {name:'ABSOL.LOL', h:15.1, pct:13.6, isNew:true},
+      {name:'EZOR',      h:9.5,  pct:8.6},
+      {name:'João',      h:4.1,  pct:3.7},
+      {name:'LOS',       h:3.6,  pct:3.3},
+      {name:'SPUN ADS',  h:1.5,  pct:1.3},
+      {name:'KAKAVEL',   h:1.3,  pct:1.2},
+      {name:'WIBR',      h:0.3,  pct:0.3},
+      {name:'MIBR',      h:0.3,  pct:0.3},
+    ],
+    bench:{'Estático':55,'Carrossel':81,'Vídeo':142,'Story':51,'Apresentação':278,'Impressão':73,'Vídeo Curto':119,'IDV':533,'Capa Redes':26},
+    people:[
+      {n:'Camile', t:33, a:209, h:71.0, avgh:2.2, hr:25.00, cpt:53.77, cpa:8.49},
+      {n:'Júlia',  t:26, a:100, h:47.4, avgh:1.8, hr:9.55,  cpt:17.40, cpa:4.52},
     ]
   },
 ];
@@ -793,28 +872,36 @@ function buildIntensityFt(cxd, mname, wf, pctBruta){
 function renderKPIs(){
   const m=MONTHS[curIdx], p=curIdx>0?MONTHS[curIdx-1]:null;
   const ap=active(m), prevAP=p?active(p):null;
-  const totT=ap.reduce((s,x)=>s+x.t,0), totA=ap.reduce((s,x)=>s+x.a,0);
-  const prevT=prevAP?prevAP.reduce((s,x)=>s+x.t,0):null;
+  const cxKT = ['Janeiro','Fevereiro','Março','Abril'][Math.min(curIdx,3)];
+  const totT = (CX_DATA[cxKT] && CX_DATA[cxKT].total) || ap.reduce((s,p)=>s+p.t,0);
+  const totA = ap.reduce((s,p)=>s+p.a,0);
+  const prevT=prevAP?((CX_DATA[['Janeiro','Fevereiro','Março','Abril'][Math.min(curIdx-1,2)]]||{}).total||prevAP.reduce((s,x)=>s+x.t,0)):null;
   const prevA=prevAP?prevAP.reduce((s,x)=>s+x.a,0):null;
   function delta(c,pv){
     if(pv===null)return'';
     const d=c-pv,up=d>0;
     return `<span class="chip ${up?'chip-g':'chip-r'}">${d>=0?'↑':'↓'} ${Math.abs(d)>100?f0(Math.abs(d)):f1(Math.abs(d))}</span>`;
   }
-  const cxKey2 = ['Janeiro','Fevereiro','Março'][Math.min(curIdx, 2)];
-  const cxd2   = CX_DATA[cxKey2] || CX_DATA['Março'];
+
+  const cxd2   = CX_DATA[cxKT] || CX_DATA['Março'];
   const wFactor = cxd2.intensity_factor;
   const wColor  = wFactor>=3?'var(--red)':wFactor>=2.5?'var(--amber)':'var(--green)';
+  // Capacidade ponderada %: weighted_h / (cap * avg_weight_if_all_equal)
+  // Simpler: raw_pct * intensity_factor gives "equivalent pct"
+  const pondPct = Math.min(Math.round(m.pct * wFactor * 10)/10, 100);
+  const prevPondPct = p ? Math.min(Math.round(p.pct * (CX_DATA[['Janeiro','Fevereiro','Março','Abril'][Math.min(curIdx-1,2)]]||{intensity_factor:1}).intensity_factor * 10)/10, 100) : null;
+
+  const ttPond = 'A capacidade ponderada considera a <strong>intensidade real</strong> das entregas, não só as horas brutas.<br><br>Cada nível de complexidade tem um peso (Baixa ×1 até Estratégica ×5). Em ' + cxKT + ': ' + f1(cxd2.raw_h) + 'h brutas → <strong>' + f1(cxd2.weighted_h) + 'h ponderadas</strong> (fator ×' + wFactor + ').<br><br>Meses com poucas horas mas demandas estratégicas pesam muito mais do que parecem.';
 
   const kpis=[
+    {ey:'Capacidade Ponderada',
+     num:`<span style="color:${wColor}">${f1(pondPct)}%</span>`,
+     ft:`×${wFactor} sobre bruta <i class="tt-icon" data-tt="${ttPond.replace(/"/g,'&quot;')}">?</i>`,
+     badge:p?delta(pondPct,prevPondPct):''},
     {ey:'Capacidade Bruta Usada',
      num:f1(m.pct)+'%',
      ft:`${f1(m.used)}h de ${f0(m.cap)}h`,
      badge:p?delta(m.pct,p.pct):''},
-    {ey:'Intensidade Real',
-     num:`<span style="color:${wColor}">×${wFactor}</span>`,
-     ft:buildIntensityFt(cxd2, cxKey2, wFactor, m.pct),
-     badge:''},
     {ey:'Tasks Entregues',  num:totT, ft:`${ap.length} designers ativos`, badge:p?delta(totT,prevT):''},
     {ey:'Artes Produzidas', num:totA, ft:'peças finalizadas',              badge:p?delta(totA,prevA):''},
   ];
@@ -822,65 +909,83 @@ function renderKPIs(){
     `<div class="card kpi"><div class="kpi-ey">${k.ey}</div><div class="kpi-num">${k.num}</div><div class="kpi-ft">${k.ft} ${k.badge}</div></div>`
   ).join('');
 }
-
-// ── CAPACITY — usa sempre os valores pré-definidos (resumo da planilha-fonte) ──
 function renderCap(){
-  const m=MONTHS[curIdx];
-  const ap=active(m);
-  const col=pctC(m.pct), grad=pctG(m.pct);
+  var m   = MONTHS[curIdx];
+  var ap  = active(m);
+  var cxKeyCap = ['Janeiro','Fevereiro','Março','Abril'][Math.min(curIdx,3)];
+  var cxdCap   = CX_DATA[cxKeyCap] || CX_DATA['Março'];
+  var wfCap    = cxdCap.intensity_factor;
+  if(typeof window._capMode === 'undefined') window._capMode = 'bruta';
+  var mode = window._capMode;
 
-  const cxKeyCap = ['Janeiro','Fevereiro','Março'][Math.min(curIdx,2)];
-  const cxdCap   = CX_DATA[cxKeyCap] || CX_DATA['Março'];
-  const wfCap    = cxdCap.intensity_factor;
-  const wfColor  = wfCap>=3?'var(--red)':wfCap>=2.5?'var(--amber)':'var(--green)';
+  var pct, usedH, cardTitle, subLabel, col, grad;
+  if(mode === 'ponderada') {
+    pct      = Math.min(Math.round(m.pct * wfCap * 10)/10, 100);
+    usedH    = cxdCap.weighted_h;
+    cardTitle = 'Capacidade Operacional Ponderada';
+    subLabel  = m.wd + ' dias úteis · ×' + wfCap + ' intensidade · ' + ap.length + ' designers';
+  } else {
+    pct      = m.pct;
+    usedH    = m.used;
+    cardTitle = 'Capacidade Operacional Bruta';
+    subLabel  = m.wd + ' dias úteis · ' + m.hd + 'h/dia · ' + ap.length + ' designers ativos';
+  }
+  col  = pct<40?'var(--green)':pct<70?'var(--amber)':'var(--red)';
+  grad = pct<40?'linear-gradient(90deg,#00d68f,#00c9b1)':pct<70?'linear-gradient(90deg,#ffb800,#ff9500)':'linear-gradient(90deg,#ff4d6a,#ff2a4a)';
 
-  document.getElementById('capCard').innerHTML=`
-    <div class="cap-hdr">
-      <div>
-        <div class="card-title">Capacidade Operacional</div>
-        <div class="card-sub">${m.wd} dias úteis · ${m.hd}h/dia · ${ap.length} designers ativos</div>
-      </div>
-      <div style="text-align:right">
-        <div class="cap-big" style="color:${col}">${f1(m.pct)}%</div>
-        <div style="font-size:11px;color:var(--muted);font-weight:300;margin-top:2px">capacidade bruta</div>
-      </div>
-    </div>
-    <div class="pt" style="height:9px;margin-bottom:9px">
-      <div class="pf" style="width:${clp(m.pct,1,100)}%;height:100%;background:${grad}"></div></div>
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:300;margin-bottom:16px">
-      <span>0h</span><span style="color:var(--text);font-weight:600">${f1(m.used)}h utilizadas</span><span>${f0(m.cap)}h total</span></div>
-    <div class="cap-dg">
-      ${[
-        {l:'Horas Usadas',  v:f1(m.used)+'h',  c:'var(--text)'},
-        {l:'Horas Livres',  v:f1(m.avail)+'h', c:'var(--green)'},
-        {l:'% Livre',       v:f1(100-m.pct)+'%', c:'var(--muted)'},
-      ].map(d=>`<div class="cap-box"><div class="cl">${d.l}</div><div class="cv" style="color:${d.c}">${d.v}</div></div>`).join('')}
-    </div>
-    <div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-      <span style="font-size:11px;color:var(--muted);font-weight:300">Intensidade real do mês</span>
-        
-      <div style="font-size:16px;font-weight:800;color:${wfColor}">×${wfCap} <span style="font-size:11px;font-weight:300;color:var(--muted)">${f1(cxdCap.weighted_h)}h ponderadas</span></div>
-    </div>`;
+  function togBtn(label, modeKey) {
+    var active = window._capMode === modeKey;
+    return '<button onclick="window._capMode=\'' + modeKey + '\';renderCap()" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;font-family:Helvena,sans-serif;cursor:pointer;border:none;' + (active?'background:var(--accent);color:#fff':'background:transparent;color:var(--muted)') + '">' + label + '</button>';
+  }
 
-  document.getElementById('costCard').innerHTML=`
-    <div class="card-title">Custo do Mês</div>
-    <div class="cost-big">${cur(m.cost)}</div>
-    ${m.people.map(p=>{
-      const col2=PC[p.n]?.color||'#9ca3af';
-      const pc2=p.h*p.hr, sh=m.cost>0?pc2/m.cost*100:0;
-      const isPont=PC[p.n]?.pontual;
-      return `<div class="cbar" style="${isPont?'opacity:.45':''}">
-        <div class="cbar-info">
-          <div class="cbar-name"><div style="width:8px;height:8px;border-radius:50%;background:${col2};flex-shrink:0"></div>
-            ${p.n}${isPont?' <span style="font-size:10px;color:var(--amber)">(apoio)</span>':''}</div>
-          <div class="cbar-val">${cur(pc2)}</div></div>
-        <div class="pt" style="height:4px"><div class="pf" style="width:${clp(sh,0,100)}%;height:100%;background:${col2}"></div></div>
-        <div style="font-size:10px;color:var(--muted);margin-top:3px;font-weight:300">${f1(sh)}% · R$ ${f2(p.hr)}/h</div>
-      </div>`;
-    }).join('')}`;
+  var toggle = '<div style="display:flex;gap:4px;background:var(--card2);border:1px solid var(--border);padding:3px;border-radius:8px;width:fit-content;margin-bottom:16px">'
+    + togBtn('Bruta','bruta') + togBtn('Ponderada','ponderada') + '</div>';
+
+  var capDetails = [
+    {l:'Horas Brutas',  v:f1(m.used)+'h',       c:'var(--text)'},
+    {l:'Horas Livres',  v:f1(m.avail)+'h',       c:'var(--green)'},
+    {l:'Intensidade',   v:'&times;'+wfCap,        c:wfCap>=3?'var(--red)':wfCap>=2.5?'var(--amber)':'var(--green)'},
+  ];
+  var capGrid = '<div class="cap-dg">'
+    + capDetails.map(function(d){ return '<div class="cap-box"><div class="cl">'+d.l+'</div><div class="cv" style="color:'+d.c+'">'+d.v+'</div></div>'; }).join('')
+    + '</div>';
+
+  document.getElementById('capCard').innerHTML = toggle
+    + '<div class="cap-hdr">'
+    +   '<div><div class="card-title">'+cardTitle+'</div><div class="card-sub">'+subLabel+'</div></div>'
+    +   '<div style="text-align:right"><div class="cap-big" style="color:'+col+'">'+f1(pct)+'%</div></div>'
+    + '</div>'
+    + '<div class="pt" style="height:9px;margin-bottom:9px"><div class="pf" style="width:'+clp(pct,1,100)+'%;height:100%;background:'+grad+'"></div></div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:300;margin-bottom:16px">'
+    +   '<span>0h</span>'
+    +   '<span style="color:var(--text);font-weight:600">'+f1(usedH)+'h '+(mode==='ponderada'?'ponderadas':'utilizadas')+'</span>'
+    +   '<span>'+f0(m.cap)+'h total</span>'
+    + '</div>'
+    + capGrid;
+
+  // Cost card
+  var costRows = m.people.map(function(p) {
+    var col2 = (PC[p.n] && PC[p.n].color) || '#9ca3af';
+    var pc2  = p.h * p.hr;
+    var sh   = m.cost > 0 ? pc2/m.cost*100 : 0;
+    var isPont = PC[p.n] && PC[p.n].pontual;
+    return '<div class="cbar"' + (isPont?' style="opacity:.45"':'') + '>'
+      + '<div class="cbar-info">'
+      +   '<div class="cbar-name">'
+      +     '<div style="width:8px;height:8px;border-radius:50%;background:'+col2+';flex-shrink:0"></div>'
+      +     p.n + (isPont?' <span style="font-size:10px;color:var(--amber)">(apoio)</span>':'')
+      +   '</div>'
+      +   '<div class="cbar-val">'+cur(pc2)+'</div>'
+      + '</div>'
+      + '<div class="pt" style="height:4px"><div class="pf" style="width:'+clp(sh,0,100)+'%;height:100%;background:'+col2+'"></div></div>'
+      + '<div style="font-size:10px;color:var(--muted);margin-top:3px;font-weight:300">'+f1(sh)+'% &middot; R$ '+f2(p.hr)+'/h</div>'
+      + '</div>';
+  }).join('');
+
+  document.getElementById('costCard').innerHTML = '<div class="card-title">Custo do M&ecirc;s</div>'
+    + '<div class="cost-big">'+cur(m.cost)+'</div>'
+    + costRows;
 }
-
-// ── PEOPLE ──
 function renderPeople(){
   const m=MONTHS[curIdx];
   const maxH=Math.max(...m.people.map(p=>p.h),1);
@@ -989,7 +1094,7 @@ function renderClients(){
     const barW=clp(c.pct/maxPct*100,2,100);
     const alert=c.pct>50?'<span class="chip chip-r" style="font-size:10px;padding:1px 6px">dependência</span>':'';
     return `<div class="client-row">
-      <div class="client-label" title="${c.name}">${c.name}</div>
+      <div class="client-label" title="${c.name}">${c.name}${c.isNew?'<span style="font-size:10px;color:var(--amber);margin-left:3px;opacity:.8" title="Nova conta">★</span>':''}</div>
       <div class="client-bar-wrap">
         <div class="client-bar-track"><div class="client-bar-fill" style="width:${barW}%;background:${col}"></div></div>
       </div>
@@ -1036,7 +1141,6 @@ function renderClients(){
 }
 
 // ── BENCHMARK ──
-const FMT_COLORS={'Carrossel':'#7b61ff','Story':'#00c9b1','Estático':'#00d68f','Vídeo':'#ff4d6a','Apresentação':'#ffb800','Motion':'#a48fff','KV':'#ff7e5f','IDV':'#43e97b','Impressão':'#f093fb','Site/UI':'#4facfe','Manual de Marca':'#00f2fe','Capa Instagram':'#fd9644'};
 
 function renderBench(){
   const m=MONTHS[curIdx], prev=curIdx>0?MONTHS[curIdx-1]:null;
@@ -1204,9 +1308,11 @@ const CX_DATA = {
     levels:{ Baixa:{t:14,pct:23.7,h:3.4,designers:[{n:'Camile',t:6,h:2.2},{n:'Júlia',t:5,h:1.0},{n:'Carol',t:3,h:0.3}]}, Média:{t:30,pct:50.8,h:20.5,designers:[{n:'Camile',t:8,h:5.9},{n:'Júlia',t:14,h:8.4},{n:'Carol',t:6,h:5.9}]}, Alta:{t:10,pct:16.9,h:11.8,designers:[{n:'Camile',t:3,h:9.3},{n:'Júlia',t:1,h:0.5},{n:'Carol',t:6,h:1.9}]}, Complexa:{t:3,pct:5.1,h:5.9,designers:[{n:'Camile',t:1,h:5.1},{n:'Júlia',t:1,h:0.7},{n:'Carol',t:1,h:0.1}]}, Estratégica:{t:1,pct:1.7,h:8.0,designers:[{n:'Camile',t:1,h:8.0}]} }},
   'Fevereiro': { total:46,  raw_h:69.9,  weighted_h:194.8, avg_w:1.87, intensity_factor:2.8,
     levels:{ Baixa:{t:18,pct:39.1,h:12.2,designers:[{n:'Camile',t:8,h:5.6},{n:'Júlia',t:10,h:6.6}]}, Média:{t:20,pct:43.5,h:25.8,designers:[{n:'Camile',t:10,h:14.8},{n:'Júlia',t:10,h:11.0}]}, Alta:{t:6,pct:13.0,h:14.2,designers:[{n:'Camile',t:3,h:7.4},{n:'Júlia',t:3,h:6.8}]}, Complexa:{t:0,pct:0,h:0,designers:[]}, Estratégica:{t:2,pct:4.3,h:17.6,designers:[{n:'Camile',t:2,h:17.6}]} }},
-  'Março':     { total:62,  raw_h:155.5, weighted_h:528.8, avg_w:1.94, intensity_factor:3.4,
-    // ✅ dados corrigidos com CSV atualizado (09/04/2026) — inclui campo complexidade em todas as tasks
-    levels:{ Baixa:{t:27,pct:43.5,h:9.7,designers:[{n:'Camile',t:21,h:6.2},{n:'Júlia',t:5,h:4.8},{n:'Mariana',t:3,h:0.0}]}, Média:{t:21,pct:33.9,h:52.5,designers:[{n:'Camile',t:10,h:23.0},{n:'Júlia',t:12,h:31.8}]}, Alta:{t:7,pct:11.3,h:20.9,designers:[{n:'Camile',t:5,h:13.4},{n:'Júlia',t:2,h:7.5}]}, Complexa:{t:2,pct:3.2,h:10.7,designers:[{n:'Camile',t:1,h:6.7},{n:'Júlia',t:2,h:10.7}]}, Estratégica:{t:5,pct:8.1,h:61.7,designers:[{n:'Camile',t:4,h:56.7},{n:'Júlia',t:1,h:5.0}]} }},
+  'Março':     { total:62,  raw_h:165.8, weighted_h:528.8, avg_w:1.94, intensity_factor:3.2,
+    // ✅ cap corrigida: 2 designers (Mariana excluída). raw_h = Camile(106h)+Júlia(59.8h)
+    levels:{ Baixa:{t:27,pct:43.5,h:9.7,designers:[{n:'Camile',t:21,h:6.2},{n:'Júlia',t:5,h:4.8}]}, Média:{t:21,pct:33.9,h:52.5,designers:[{n:'Camile',t:10,h:23.0},{n:'Júlia',t:12,h:31.8}]}, Alta:{t:7,pct:11.3,h:20.9,designers:[{n:'Camile',t:5,h:13.4},{n:'Júlia',t:2,h:7.5}]}, Complexa:{t:2,pct:3.2,h:10.7,designers:[{n:'Camile',t:1,h:6.7},{n:'Júlia',t:2,h:10.7}]}, Estratégica:{t:5,pct:8.1,h:61.7,designers:[{n:'Camile',t:4,h:56.7},{n:'Júlia',t:1,h:5.0}]} }},
+  'Abril':     { total:57,  raw_h:118.4, weighted_h:316.5, avg_w:1.84, intensity_factor:2.8,
+    levels:{ Baixa:{t:28,pct:49.1,h:21.8,designers:[{n:'Camile',t:13,h:9.0},{n:'Júlia',t:16,h:15.4}]}, Média:{t:21,pct:36.8,h:38.9,designers:[{n:'Camile',t:14,h:23.7},{n:'Júlia',t:7,h:15.2}]}, Alta:{t:3,pct:5.3,h:16.8,designers:[{n:'Camile',t:1,h:4.3},{n:'Júlia',t:3,h:16.8}]}, Complexa:{t:0,pct:0,h:0,designers:[]}, Estratégica:{t:3,pct:5.3,h:32.9,designers:[{n:'Camile',t:3,h:32.9}]} }},
 };
 const AVG_H   = { Baixa:0.44, Média:1.33, Alta:2.07, Complexa:3.32, Estratégica:14.49 };
 
@@ -1223,14 +1329,33 @@ const DESIGNER_CX = {
     'Júlia':  { total_t:23, total_h:24.4, cx:{ Baixa:{t:10,h:6.6}, Média:{t:10,h:11.0}, Alta:{t:3,h:6.8} }},
   },
   'Março': {
-    'Camile':  { total_t:41, total_h:106.0, cx:{ Baixa:{t:21,h:6.2}, Média:{t:10,h:23.0}, Alta:{t:5,h:13.4}, Complexa:{t:1,h:6.7}, Estratégica:{t:4,h:56.7} }},
-    'Júlia':   { total_t:22, total_h:59.8,  cx:{ Baixa:{t:5,h:4.8},  Média:{t:12,h:31.8}, Alta:{t:2,h:7.5},  Complexa:{t:2,h:10.7}, Estratégica:{t:1,h:5.0}  }},
-    'Mariana': { total_t:3,  total_h:0.0,   cx:{ Baixa:{t:3,h:0.0} }},
+    'Camile': { total_t:41, total_h:106.0, cx:{ Baixa:{t:21,h:6.2}, Média:{t:10,h:23.0}, Alta:{t:5,h:13.4}, Complexa:{t:1,h:6.7}, Estratégica:{t:4,h:56.7} }},
+    'Júlia':  { total_t:22, total_h:59.8,  cx:{ Baixa:{t:5,h:4.8},  Média:{t:12,h:31.8}, Alta:{t:2,h:7.5},  Complexa:{t:2,h:10.7}, Estratégica:{t:1,h:5.0}  }},
+  },
+  'Abril': {
+    'Camile': { total_t:33, total_h:71.0,  cx:{ Baixa:{t:13,h:9.0},  Média:{t:14,h:23.7}, Alta:{t:1,h:4.3},  Estratégica:{t:3,h:32.9} }},
+    'Júlia':  { total_t:26, total_h:47.4,  cx:{ Baixa:{t:16,h:15.4}, Média:{t:7,h:15.2},  Alta:{t:3,h:16.8}  }},
+  },
+  'Abril': {
+    'Camile': { total_t:33, total_h:71.0,  cx:{ Baixa:{t:13,h:9.0},  Média:{t:14,h:23.7}, Alta:{t:1,h:4.3},  Estratégica:{t:3,h:32.9} }},
+    'Júlia':  { total_t:26, total_h:47.4,  cx:{ Baixa:{t:16,h:15.4}, Média:{t:7,h:15.2},  Alta:{t:3,h:16.8}  }},
   },
 };
 const CX_COLORS = { Baixa:'#00d68f', Média:'#7b61ff', Alta:'#ffb800', Complexa:'#ff4d6a', Estratégica:'#f093fb' };
+
+const FORMAT_DATA = {
+  'Janeiro':   { 'Estático':{t:19,h:10.3,a:53,avg:33}, 'Carrossel':{t:13,h:13.6,a:40,avg:63}, 'Capa Redes':{t:12,h:3.1,a:37,avg:16}, 'Story':{t:10,h:4.7,a:26,avg:28}, 'Vídeo':{t:5,h:2.7,a:6,avg:32}, 'Outro':{t:3,h:2.9,a:17,avg:58}, 'Apresentação':{t:2,h:5.1,a:6,avg:154}, 'Evento':{t:1,h:5.1,a:3,avg:307}, 'Estratégico':{t:1,h:8.0,a:1,avg:480} },
+  'Fevereiro': { 'Carrossel':{t:16,h:23.1,a:76,avg:87}, 'Estático':{t:12,h:8.9,a:16,avg:45}, 'Story':{t:8,h:5.1,a:23,avg:38}, 'Apresentação':{t:5,h:11.6,a:12,avg:139}, 'Doc':{t:3,h:6.1,a:3,avg:121}, 'Outro':{t:3,h:2.4,a:7,avg:48}, 'IDV':{t:2,h:18.6,a:1,avg:560}, 'Vídeo':{t:2,h:1.7,a:4,avg:50}, 'Capa Redes':{t:2,h:1.7,a:4,avg:50}, 'Estratégico':{t:1,h:1.2,a:15,avg:71}, 'UI/UX':{t:1,h:1.5,a:0,avg:90} },
+  'Março':     { 'Estático':{t:21,h:20.1,a:40,avg:58}, 'Story':{t:12,h:20.2,a:86,avg:101}, 'Carrossel':{t:12,h:19.9,a:76,avg:99}, 'Apresentação':{t:5,h:29.5,a:31,avg:354}, 'IDV':{t:5,h:28.3,a:20,avg:339}, 'Outro':{t:5,h:8.0,a:18,avg:95}, 'Motion':{t:4,h:6.1,a:5,avg:92}, 'Vídeo':{t:3,h:7.4,a:3,avg:147}, 'Estratégico':{t:2,h:44.9,a:7,avg:1348}, 'Capa Redes':{t:2,h:1.1,a:8,avg:32}, 'UI/UX':{t:1,h:38.2,a:0,avg:2292}, 'Impressão':{t:1,h:8.8,a:1,avg:531} },
+  // Abril: Reels → Vídeo, Banner → Estático, Newsletter → Estático, Capa Redes Sociais → Capa Redes
+  'Abril':     { 'Estático':{t:17,h:16.3,a:64,avg:54}, 'Carrossel':{t:13,h:17.4,a:85,avg:81}, 'Vídeo':{t:13,h:30.7,a:41,avg:142}, 'Story':{t:7,h:6.0,a:33,avg:51}, 'Apresentação':{t:4,h:18.5,a:64,avg:278}, 'Impressão':{t:4,h:4.8,a:20,avg:73}, 'IDV':{t:2,h:17.8,a:8,avg:533}, 'Outro':{t:2,h:8.6,a:12,avg:256}, 'Capa Redes':{t:3,h:1.3,a:6,avg:26} },
+  // Abril: Reels→Vídeo, Banner→Estático, Newsletter→Estático, Capa Redes Sociais→Capa Redes
+  'Abril':     { 'Estático':{t:17,h:16.3,a:64,avg:58}, 'Carrossel':{t:13,h:17.4,a:85,avg:81}, 'Vídeo':{t:13,h:30.7,a:41,avg:142}, 'Story':{t:7,h:6.0,a:33,avg:51}, 'Apresentação':{t:4,h:18.5,a:64,avg:278}, 'Impressão':{t:4,h:4.8,a:20,avg:73}, 'IDV':{t:2,h:17.8,a:8,avg:533}, 'Outro':{t:2,h:8.6,a:12,avg:256}, 'Capa Redes':{t:3,h:1.3,a:6,avg:26} },
+};
+const FMT_COLORS = {'Carrossel':'#7b61ff','Estático':'#00c9b1','Story':'#ffb800','Vídeo':'#ff4d6a','Motion':'#f093fb','Apresentação':'#4facfe','IDV':'#43e97b','UI/UX':'#00f2fe','Estratégico':'#ff7e5f','Doc':'#a48fff','Capa Redes':'#fd9644','Evento':'#2ed573','Impressão':'#ffa502','Outro':'#636680'};
+
 const LEVELS  = ['Baixa','Média','Alta','Complexa','Estratégica'];
-const CX_MONTHS = ['Janeiro','Fevereiro','Março'];
+const CX_MONTHS = ['Janeiro','Fevereiro','Março','Abril'];
 
 // ── FUSED SECTION: Absorção + Complexidade ──
 
@@ -1562,51 +1687,75 @@ function renderFused() {
     </div>`;
   }).join('');
 
-  // ── LINE CHART — complexity trends ──
-  const svgW = 560, svgH = 140, padL = 36, padR = 20, padT = 20, padB = 26;
-  const innerW = svgW - padL - padR;
-  const innerH = svgH - padT - padB;
-  const xPos = (i) => padL + (i / (CX_MONTHS.length - 1)) * innerW;
-  const maxPct = 65;
+  // ── LINE CHART — interactive with level selector ──
+  if(typeof window._lcFilter === 'undefined') window._lcFilter = 'all';
 
-  let svgContent = `<svg viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">`;
+  // Build control buttons
+  var lcControls = '<div class="lc-controls">'
+    + '<button class="lc-ctrl-btn' + (window._lcFilter==='all'?' active':'') + '" style="' + (window._lcFilter==='all'?'background:var(--accent)':'') + '" onclick="window._lcFilter=\'all\';renderFused()"><div class="lc-ctrl-dot" style="background:var(--accent)"></div>Todos</button>';
+  LEVELS.forEach(function(lv) {
+    var col = CX_COLORS[lv];
+    var isActive = window._lcFilter === lv;
+    lcControls += '<button class="lc-ctrl-btn' + (isActive?' active':'') + '" style="' + (isActive?'background:'+col:'') + '" onclick="window._lcFilter=\'' + lv + '\';renderFused()"><div class="lc-ctrl-dot" style="background:' + col + '"></div>' + lv + '</button>';
+  });
+  lcControls += '</div>';
 
-  // grid lines
-  [0, 20, 40, 60].forEach(v => {
-    const y = padT + innerH - (v / maxPct) * innerH;
-    svgContent += `<line x1="${padL}" y1="${y}" x2="${svgW-padR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
-    svgContent += `<text x="${padL-4}" y="${y+4}" text-anchor="end" fill="#636680" font-size="9" font-family="Helvena,sans-serif">${v}%</text>`;
+  // Build SVG
+  var svgW = 520, svgH = 180, padL = 40, padR = 20, padT = 30, padB = 30;
+  var innerW = svgW - padL - padR, innerH = svgH - padT - padB;
+  var maxPct = 60;
+  function xPos(i) { return padL + (i / (CX_MONTHS.length - 1)) * innerW; }
+
+  var svgContent = '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">';
+
+  // Grid
+  [0, 15, 30, 45, 60].forEach(function(v) {
+    var y = padT + innerH - (v / maxPct) * innerH;
+    svgContent += '<line x1="' + padL + '" y1="' + y + '" x2="' + (svgW-padR) + '" y2="' + y + '" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>';
+    svgContent += '<text x="' + (padL-6) + '" y="' + (y+4) + '" text-anchor="end" fill="#636680" font-size="9" font-family="Helvena,sans-serif">' + v + '%</text>';
   });
 
-  // month labels
-  CX_MONTHS.forEach((mn, i) => {
-    svgContent += `<text x="${xPos(i)}" y="${svgH-2}" text-anchor="middle" fill="#636680" font-size="10" font-family="Helvena,sans-serif">${mn.slice(0,3)}</text>`;
+  // Month labels
+  CX_MONTHS.forEach(function(mn, i) {
+    svgContent += '<text x="' + xPos(i) + '" y="' + (svgH-4) + '" text-anchor="middle" fill="#636680" font-size="11" font-family="Helvena,sans-serif" font-weight="500">' + mn.slice(0,3) + '</text>';
   });
 
-  // lines per level
-  LEVELS.forEach(lv => {
-    const col = CX_COLORS[lv];
-    const pts = CX_MONTHS.map((mn, i) => {
-      const pct = CX_DATA[mn].levels[lv]?.pct || 0;
-      const y = padT + innerH - clp(pct / maxPct, 0, 1) * innerH;
-      return `${xPos(i)},${y}`;
+  // Determine which levels to show
+  var showLevels = window._lcFilter === 'all' ? LEVELS : [window._lcFilter];
+  var isSingle = showLevels.length === 1;
+
+  // Lines + areas
+  showLevels.forEach(function(lv) {
+    var col = CX_COLORS[lv];
+    var points = CX_MONTHS.map(function(mn, i) {
+      var pct = (CX_DATA[mn] && CX_DATA[mn].levels[lv]) ? CX_DATA[mn].levels[lv].pct : 0;
+      var y = padT + innerH - clp(pct / maxPct, 0, 1) * innerH;
+      return { x: xPos(i), y: y, pct: pct, mn: mn };
     });
-    svgContent += `<polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>`;
 
-    // dots
-    CX_MONTHS.forEach((mn, i) => {
-      const pct = CX_DATA[mn].levels[lv]?.pct || 0;
-      const y = padT + innerH - clp(pct / maxPct, 0, 1) * innerH;
-      const x = xPos(i);
-      svgContent += `<circle cx="${x}" cy="${y}" r="3.5" fill="${col}" stroke="#191c26" stroke-width="1.5"/>`;
-      if (pct > 0) {
-        // stagger label offset by level index to avoid overlap
-      var lvIdx = LEVELS.indexOf(lv);
-      var yOff  = (lvIdx % 2 === 0) ? -10 : 7;
-      var anchor = yOff < 0 ? 'middle' : 'middle';
-      var labelY = yOff < 0 ? (y + yOff) : (y + yOff + 4);
-      if(labelY < 10) labelY = y + 10;
-      svgContent += '<text x="' + x + '" y="' + labelY + '" text-anchor="middle" fill="' + col + '" font-size="9" font-family="Helvena,sans-serif" font-weight="700">' + Math.round(pct) + '%</text>';
+    // Area fill (only when single level selected)
+    if(isSingle) {
+      var areaPath = 'M' + points[0].x + ',' + (padT + innerH);
+      points.forEach(function(p) { areaPath += ' L' + p.x + ',' + p.y; });
+      areaPath += ' L' + points[points.length-1].x + ',' + (padT + innerH) + ' Z';
+      svgContent += '<path d="' + areaPath + '" fill="' + col + '" opacity="0.08"/>';
+    }
+
+    // Line
+    var linePts = points.map(function(p) { return p.x + ',' + p.y; }).join(' ');
+    svgContent += '<polyline points="' + linePts + '" fill="none" stroke="' + col + '" stroke-width="' + (isSingle?3:2) + '" stroke-linejoin="round" stroke-linecap="round" opacity="' + (isSingle?1:0.8) + '"/>';
+
+    // Dots + labels
+    points.forEach(function(p, i) {
+      svgContent += '<circle class="lc-point" cx="' + p.x + '" cy="' + p.y + '" r="' + (isSingle?5:4) + '" fill="' + col + '" stroke="var(--card)" stroke-width="2"'
+        + ' onmouseenter="showPizzaTT(event,\'' + lv + ': ' + Math.round(p.pct) + '% em ' + p.mn.slice(0,3) + '\',\'' + col + '\')"'
+        + ' onmouseleave="hidePizzaTT()"/>';
+
+      // Label: show for single or when not too crowded
+      if(isSingle || p.pct > 5) {
+        var lx = p.x, ly = p.y - 12;
+        if(ly < 10) ly = p.y + 18;
+        svgContent += '<text x="' + lx + '" y="' + ly + '" text-anchor="middle" fill="' + col + '" font-size="' + (isSingle?12:10) + '" font-family="Helvena,sans-serif" font-weight="700">' + Math.round(p.pct) + '%</text>';
       }
     });
   });
@@ -1645,7 +1794,7 @@ function renderFused() {
           ⚡ Intensidade ${cxKey}: ×${ifactor}
         </div>
         <div class="tooltip-wrap">
-          <span style="font-size:12px;color:var(--muted);font-weight:300">O que é Carga Ponderada?</span>
+          
           
         </div>
       </div>
@@ -1669,15 +1818,13 @@ function renderFused() {
         <div class="wheel-legend" id="wheelLegend"></div>
       </div>
       <div class="line-chart-wrap" style="margin-top:24px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-          <div class="lc-title">Tendência de complexidade — Jan a Mar</div>
-          <div style="display:flex;flex-wrap:wrap;gap:12px">${lineLegend}</div>
-        </div>
-        <div class="lc-svg-wrap">${svgContent}</div>
+        <div style="margin-bottom:4px"><div class="lc-title">Tendência de complexidade — Jan a Mar</div></div>
+        ${lcControls}
+        <div class="lc-chart-area">${svgContent}</div>
       </div>
     </div>  `;
   // init wheel with current month cx data
-  var _wMonth = ['Janeiro','Fevereiro','Março'][Math.min(curIdx,2)];
+  var _wMonth = ['Janeiro','Fevereiro','Março','Abril'][Math.min(curIdx,3)];
   initWheel(_wMonth);
 }
 
@@ -1910,10 +2057,11 @@ function renderAutoReport(){
 
   const reports = MONTHS.map((m, idx) => {
     const ap = active(m);
-    const cxKey = ['Janeiro','Fevereiro','Março'][Math.min(idx, 2)];
+    const cxKey = ['Janeiro','Fevereiro','Março','Abril'][Math.min(idx, 2)];
     const cxd   = CX_DATA[cxKey] || CX_DATA['Março'];
 
-    const totT = ap.reduce((s,p)=>s+p.t,0);
+    const cxKT = ['Janeiro','Fevereiro','Março','Abril'][Math.min(curIdx,3)];
+    const totT = (CX_DATA[cxKT] && CX_DATA[cxKT].total) || ap.reduce((s,p)=>s+p.t,0);
     const totA = ap.reduce((s,p)=>s+p.a,0);
     const wfact = cxd.intensity_factor;
 
@@ -2012,9 +2160,160 @@ function toggleReport(idx){
   arrow.style.transform = open ? '' : 'rotate(180deg)';
 }
 
+
+function renderFormats() {
+  var wrap = document.getElementById('fmtWrap');
+  if(!wrap) return;
+  if(typeof window._fmtMode === 'undefined') window._fmtMode = 'mensal';
+  var isAnual = window._fmtMode === 'anual';
+  var mnames  = ['Janeiro','Fevereiro','Março','Abril'];
+  var mname   = mnames[Math.min(curIdx, 3)];
+
+  // Build toggle
+  var toggle = '<div style="display:flex;gap:4px;background:var(--card2);border:1px solid var(--border);padding:3px;border-radius:8px;width:fit-content">'
+    + '<button onclick="window._fmtMode=\'mensal\';renderFormats()" style="padding:6px 16px;border-radius:6px;font-size:13px;font-weight:500;font-family:Helvena,sans-serif;cursor:pointer;border:none;' + (!isAnual ? 'background:var(--accent);color:#fff' : 'background:transparent;color:var(--muted)') + '">Mensal</button>'
+    + '<button onclick="window._fmtMode=\'anual\';renderFormats()" style="padding:6px 16px;border-radius:6px;font-size:13px;font-weight:500;font-family:Helvena,sans-serif;cursor:pointer;border:none;' + (isAnual ? 'background:var(--accent);color:#fff' : 'background:transparent;color:var(--muted)') + '">Anual</button>'
+    + '</div>';
+
+  var header = '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px">'
+    + '<div><div class="card-title">Distribuição por Formato</div>'
+    + '<div class="card-sub" style="margin-top:3px">' + (isAnual ? 'Tendência Jan → Mar — volume de entregas por tipo ao longo do trimestre.' : 'Tipos de entrega mais produzidos no mês: quantidade, tempo e carga.') + '</div></div>'
+    + toggle
+    + '</div>';
+
+  if(isAnual) {
+    // ── ANUAL VIEW: sparkline trend bars ──
+    var allFmts = {};
+    mnames.forEach(function(mn) {
+      Object.keys(FORMAT_DATA[mn]||{}).forEach(function(f){ allFmts[f] = true; });
+    });
+    var topFmts = Object.keys(allFmts).sort(function(a,b){
+      var sa = mnames.reduce(function(s,mn){ return s+((FORMAT_DATA[mn]||{})[a]||{t:0}).t; },0);
+      var sb = mnames.reduce(function(s,mn){ return s+((FORMAT_DATA[mn]||{})[b]||{t:0}).t; },0);
+      return sb - sa;
+    });
+    var maxT = 1;
+    topFmts.forEach(function(f){
+      mnames.forEach(function(mn){
+        var t = ((FORMAT_DATA[mn]||{})[f]||{t:0}).t;
+        if(t > maxT) maxT = t;
+      });
+    });
+    var trendRows = topFmts.map(function(fmt) {
+      var col = FMT_COLORS[fmt] || '#636680';
+      var bars = mnames.map(function(mn, mi) {
+        var d = ((FORMAT_DATA[mn]||{})[fmt]||{t:0,h:0});
+        var hPct = Math.max(Math.round(d.t/maxT*100), 4);
+        var active = mi === Math.min(curIdx, 2);
+        return '<div class="fmt-trend-bar" style="height:'+hPct+'%;background:'+col+';opacity:'+(active?'1':'0.35')+'" data-tip="'+mn.slice(0,3)+': '+d.t+'t · '+f1(d.h||0)+'h"></div>';
+      }).join('');
+      var totT = mnames.reduce(function(s,mn){return s+((FORMAT_DATA[mn]||{})[fmt]||{t:0}).t;},0);
+      var totH = mnames.reduce(function(s,mn){return s+((FORMAT_DATA[mn]||{})[fmt]||{h:0}).h;},0);
+      return '<div class="fmt-trend-item">'
+        + '<div class="fmt-trend-name" style="color:'+col+'">'+fmt+'</div>'
+        + '<div class="fmt-trend-bars">'+bars+'</div>'
+        + '<div style="font-size:11px;color:var(--text);font-weight:600;width:28px;text-align:right;flex-shrink:0">'+totT+'</div>'
+        + '<div style="font-size:11px;color:var(--muted);font-weight:300;width:44px;text-align:right;flex-shrink:0">'+f1(totH)+'h</div>'
+        + '</div>';
+    }).join('');
+
+    // Month labels
+    var monthLabels = '<div class="fmt-trend-item" style="margin-bottom:8px">'
+      + '<div class="fmt-trend-name" style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Formato</div>'
+      + '<div class="fmt-trend-bars" style="height:auto">'
+      + mnames.map(function(mn,mi){
+          var active = mi===Math.min(curIdx,2);
+          return '<div style="flex:1;text-align:center;font-size:10px;font-weight:'+(active?'700':'400')+';color:'+(active?'var(--text)':'var(--muted)')+'">'+mn.slice(0,3)+'</div>';
+        }).join('')
+      + '</div>'
+      + '<div style="width:28px;text-align:right;font-size:10px;color:var(--muted);flex-shrink:0">Total</div>'
+      + '<div style="width:44px;text-align:right;font-size:10px;color:var(--muted);flex-shrink:0">Horas</div>'
+      + '</div>';
+
+    wrap.innerHTML = header
+      + '<div style="background:var(--card2);border-radius:10px;padding:16px">'
+      + monthLabels
+      + '<div style="height:1px;background:var(--border);margin-bottom:10px"></div>'
+      + '<div class="fmt-trend">'+trendRows+'</div>'
+      + '</div>';
+
+  } else {
+    // ── MENSAL VIEW: staffing table ──
+    var data = FORMAT_DATA[mname] || {};
+    var entries = Object.entries(data).sort(function(a,b){ return b[1].t - a[1].t; });
+    var maxH = entries.reduce(function(s,p){ return Math.max(s,p[1].h); }, 1);
+    var totT=0, totH=0, totA=0;
+    entries.forEach(function(p){ totT+=p[1].t; totH+=p[1].h; totA+=p[1].a; });
+
+    var rows = entries.map(function(pair) {
+      var fmt=pair[0], d=pair[1], col=FMT_COLORS[fmt]||'#636680';
+      var barW = Math.round(d.h/maxH*100);
+      var avgH = d.avg>=60 ? Math.floor(d.avg/60)+'h'+(d.avg%60>0?(d.avg%60<10?'0':'')+d.avg%60+'m':'') : d.avg+'min';
+      var pctH = Math.round(d.h/totH*100);
+      return '<tr>'
+        +'<td><div class="st-fmt"><div class="fmt-dot" style="background:'+col+'"></div>'+fmt+'</div></td>'
+        +'<td class="st-num">'+d.t+'</td>'
+        +'<td style="color:var(--muted);font-size:12px">'+avgH+'</td>'
+        +'<td class="st-num">'+f1(d.h)+'h</td>'
+        +'<td><div class="st-bar"><div class="st-bar-fill" style="width:'+barW+'%;background:'+col+'"></div></div></td>'
+        +'<td class="st-num">'+pctH+'%</td>'
+        +'<td class="st-num">'+d.a+'</td>'
+        +'</tr>';
+    }).join('');
+
+    rows += '<tr style="border-top:2px solid var(--border);font-weight:700">'
+      +'<td style="color:var(--text)">Total</td>'
+      +'<td class="st-num">'+totT+'</td>'
+      +'<td>—</td>'
+      +'<td class="st-num">'+f1(totH)+'h</td>'
+      +'<td></td>'
+      +'<td class="st-num">100%</td>'
+      +'<td class="st-num">'+totA+'</td>'
+      +'</tr>';
+
+    var insight = '';
+    var top2 = entries.slice(0,2);
+    var top2pct = Math.round(top2.reduce(function(s,p){return s+p[1].h;},0)/totH*100);
+    insight = top2.map(function(p){return p[0];}).join(' e ')+' respondem por <strong style="color:var(--text)">'+top2pct+'%</strong> das horas do mês.';
+
+    wrap.innerHTML = header
+      + '<table class="staff-table">'
+      + '<thead><tr><th>Formato</th><th>Qtd</th><th>Tempo Médio</th><th>Total</th><th style="min-width:70px">Carga</th><th>%</th><th>Artes</th></tr></thead>'
+      + '<tbody>'+rows+'</tbody></table>'
+      + '<div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:8px;font-size:12px;color:var(--muted);font-weight:300;line-height:1.6">💡 '+insight+'</div>';
+  }
+}
+function renderStaffingLimit() {
+  var el=document.getElementById('staffLimitWrap');
+  if(!el) return;
+  var m=MONTHS[curIdx];
+  var ap=active(m);
+  var mnames=['Janeiro','Fevereiro','Março','Abril'];
+  var avgH=mnames.reduce(function(s,mn){var d=FORMAT_DATA[mn]||{};return s+Object.values(d).reduce(function(ss,v){return ss+v.h;},0);},0)/mnames.length;
+  var capPP=m.wd*m.hd;
+  var totalCap=ap.reduce(function(s,p){return s+capPP*((PC[p.n]&&PC[p.n].exec)||1);},0);
+  var scenarios=[
+    {label:'Atual (sem mudanças)',extra:0},
+    {label:'+2 IDVs/mês',extra:2*5.65},
+    {label:'+5 Carrosséis/mês',extra:5*1.65},
+    {label:'+1 task Estratégica/mês',extra:22.5},
+    {label:'Novas 2 contas (social)',extra:2*(8*0.44+12*1.33)},
+    {label:'Novas 2 contas (IDV+social)',extra:2*5.65+2*(8*0.44+12*1.33)},
+  ];
+  var rows=scenarios.map(function(sc){
+    var newH=avgH+sc.extra;
+    var pct=Math.round(newH/totalCap*100);
+    var col=pct<40?'var(--green)':pct<65?'var(--amber)':'var(--red)';
+    var signal=pct<40?'✅':pct<65?'🟡':pct<85?'⚠️':'🚨';
+    var hire=pct>=65?'<span style="color:var(--red);font-weight:600"> → Contratar</span>':pct>=50?'<span style="color:var(--amber);font-weight:600"> → Monitorar</span>':'';
+    return '<tr><td style="font-size:13px;font-weight:500;color:var(--text)">'+sc.label+'</td><td class="st-num">+'+f1(sc.extra)+'h</td><td class="st-num">'+f1(newH)+'h</td><td class="st-num" style="color:'+col+'">'+pct+'%</td><td style="font-size:15px">'+signal+hire+'</td></tr>';
+  }).join('');
+  el.innerHTML='<div class="card-title">Limite Operacional Projetado</div><div class="card-sub" style="margin-top:3px">Se aumentar X tasks de cada tipo, quando precisa contratar? Baseado na média de '+f1(avgH)+'h/mês vs capacidade de '+f1(totalCap)+'h/mês.</div><table class="staff-table" style="margin-top:14px"><thead><tr><th>Cenário</th><th>Extras/mês</th><th>Total/mês</th><th>% Cap.</th><th>Sinal</th></tr></thead><tbody>'+rows+'</tbody></table><div style="margin-top:14px;padding:12px 16px;background:var(--card2);border-radius:8px;font-size:12px;color:var(--muted);font-weight:300;line-height:1.6">📊 Contratação recomendada quando projeção ultrapassa <strong style="color:var(--amber)">65%</strong>. Acima de <strong style="color:var(--red)">85%</strong> é crítico — sem margem para imprevistos.</div>';
+}
+
 function renderAll(){
   renderTabs();renderKPIs();renderCap();renderPeople();
-  renderClients();renderBench();renderTrend();renderFused();renderHire();renderSim();renderRpts();renderAutoReport();renderDates();
+  renderClients();renderFormats();renderStaffingLimit();renderBench();renderTrend();renderFused();renderHire();renderSim();renderRpts();renderAutoReport();renderDates();
 }
 
 renderTicker();renderAll();
