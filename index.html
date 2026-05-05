@@ -709,7 +709,7 @@ input[type=range] { width:100%; accent-color:var(--accent); cursor:pointer }
 // CONFIG
 // ================================================================
 const PC = {
-  'Camile':   { color:'#7b61ff', exec:0.70, role:'Design Lead · Sênior + Gestão', mgr:true,   pontual:false },
+  'Camile':   { color:'#7b61ff', exec:0.60, role:'Design Lead · Sênior + Gestão', mgr:true,   pontual:false },
   'Júlia':    { color:'#00c9b1', exec:1.00, role:'Designer Júnior',               mgr:false,  pontual:false },
   // Carol: histórico Jan/Fev — saiu do time
   'Carol':    { color:'#ff4d6a', exec:1.00, role:'Designer',                      mgr:false,  pontual:true  },
@@ -1031,7 +1031,7 @@ function renderDemand(){
     total+=absT;
     return `<div class="fc-card">
       <div class="fc-person"><div class="fc-dot" style="background:${col}"></div>${p.n}
-        ${PC[p.n]?.mgr?'<span style="font-size:10px;background:rgba(123,97,255,.14);color:var(--accent-lt);padding:2px 7px;border-radius:20px;margin-left:auto;font-weight:600">−30% gestão</span>':''}
+        ${PC[p.n]?.mgr?'<span style="font-size:10px;background:rgba(123,97,255,.14);color:var(--accent-lt);padding:2px 7px;border-radius:20px;margin-left:auto;font-weight:600">−40% gestão</span>':''}
       </div>
       <div class="fc-row"><span>Horas disponíveis</span><strong>${f0(avail)}h</strong></div>
       <div class="fc-row"><span>Para execução</span><strong>${f0(real)}h</strong></div>
@@ -1044,7 +1044,7 @@ function renderDemand(){
   const sig=m.pct<40?'🟢 Folga confortável':m.pct<70?'🟡 Carga crescendo':'🔴 Próximo do limite';
   document.getElementById('demandWrap').innerHTML=`
     <div class="card-title">Absorção de Novas Demandas</div>
-    <div class="card-sub" style="margin-top:3px">Estimativa com a carga já registrada. Camile tem 30% do tempo em gestão.</div>
+    <div class="card-sub" style="margin-top:3px">Estimativa com a carga já registrada. Camile tem 40% do tempo em gestão.</div>
     <div class="fc-grid">${cards}</div>
     <div class="absorb-box">
       <div class="absorb-num">${total}</div>
@@ -1605,8 +1605,8 @@ function renderFused() {
       </div>
       <div class="pabs-row"><span>Margem disponível no mês</span><strong>${f0(avail)}h</strong></div>
       ${cfg.mgr ? `<div class="pabs-row" style="color:var(--amber)">
-        <span>Reservado à gestão (30%)</span>
-        <strong style="color:var(--amber)">−${f0(avail*0.30)}h</strong>
+        <span>Reservado à gestão (40%)</span>
+        <strong style="color:var(--amber)">−${f0(avail*0.40)}h</strong>
       </div>` : ''}
       <div class="pabs-row"><span>Disponível p/ execução</span><strong>${f0(real)}h</strong></div>
       <div class="pabs-row" style="color:var(--text)">
