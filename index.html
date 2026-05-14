@@ -369,7 +369,7 @@ body{font-family:'Helvena',system-ui,sans-serif;font-weight:300;background:#0d0e
 .d-chip .d-info strong { color:var(--text); font-weight:600 }
 
 /* line chart */
-.line-chart-wrap { margin-top:20px }
+.line-chart-wrap { margin-top:20px; max-width:680px }
 .lc-title { font-size:12px; font-weight:600; color:var(--dim); margin-bottom:12px }
 .lc-svg-wrap { width:100%; overflow:hidden; border-radius:8px; background:var(--card); padding:12px 8px 6px }
 
@@ -521,7 +521,8 @@ input[type=range] { width:100%; accent-color:var(--accent); cursor:pointer }
 .lc-ctrl-btn:hover { color:var(--text); border-color:var(--border2) }
 .lc-ctrl-btn.active { color:#fff; border-color:transparent }
 .lc-ctrl-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0 }
-.lc-chart-area { background:var(--card); border-radius:10px; padding:16px 12px 8px; position:relative }
+.lc-chart-area { background:var(--card); border-radius:10px; padding:16px 12px 8px; position:relative; max-width:680px }
+.lc-chart-area svg { max-height:200px }
 .lc-point { cursor:default; transition:r 0.15s }
 .lc-point:hover { r:6 }
 
@@ -1745,18 +1746,17 @@ function renderFused() {
     var linePts = points.map(function(p) { return p.x + ',' + p.y; }).join(' ');
     svgContent += '<polyline points="' + linePts + '" fill="none" stroke="' + col + '" stroke-width="' + (isSingle?3:2) + '" stroke-linejoin="round" stroke-linecap="round" opacity="' + (isSingle?1:0.8) + '"/>';
 
-    // Dots + labels
+    // Dots — hover tooltip only, no always-visible labels
     points.forEach(function(p, i) {
-      svgContent += '<circle class="lc-point" cx="' + p.x + '" cy="' + p.y + '" r="' + (isSingle?5:4) + '" fill="' + col + '" stroke="var(--card)" stroke-width="2"'
-        + ' onmouseenter="showPizzaTT(event,\'' + lv + ': ' + Math.round(p.pct) + '% em ' + p.mn.slice(0,3) + '\',\'' + col + '\')"'
+      var tipLabel = lv + ': ' + Math.round(p.pct) + '% em ' + p.mn.slice(0,3);
+      // Visible dot (pointer-events off so hit area handles hover)
+      svgContent += '<circle class="lc-point" cx="' + p.x + '" cy="' + p.y + '" r="' + (isSingle?5:4) + '" fill="' + col + '" stroke="var(--card)" stroke-width="2" pointer-events="none"/>';
+      // Invisible larger hit area — use data attributes to avoid inline quote hell
+      svgContent += '<circle cx="' + p.x + '" cy="' + p.y + '" r="12" fill="transparent" style="cursor:default"'
+        + ' data-tip="' + tipLabel.replace(/"/g, '&quot;') + '"'
+        + ' data-col="' + col + '"'
+        + ' onmouseenter="showPizzaTT(event,this.dataset.tip,this.dataset.col)"'
         + ' onmouseleave="hidePizzaTT()"/>';
-
-      // Label: show for single or when not too crowded
-      if(isSingle || p.pct > 5) {
-        var lx = p.x, ly = p.y - 12;
-        if(ly < 10) ly = p.y + 18;
-        svgContent += '<text x="' + lx + '" y="' + ly + '" text-anchor="middle" fill="' + col + '" font-size="' + (isSingle?12:10) + '" font-family="Helvena,sans-serif" font-weight="700">' + Math.round(p.pct) + '%</text>';
-      }
     });
   });
 
