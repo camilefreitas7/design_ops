@@ -827,7 +827,29 @@ let MONTHS = [
       {n:'Júlia',  t:30, a:145, h:43.2, avgh:1.4, hr:9.55,  cpt:13.77, cpa:2.85},
     ]
   },
-];
+,
+  {
+    id:'jun26', label:'Jun', full:'Junho 2026',
+    wd:21, hd:8,
+    // Cap ajustada: Camile mês todo (21d = 168h) + Júlia até 18/06 (13d úteis = 104h) = 272h.
+    // Júlia saiu em 18/06 — capacidade proporcional aos dias trabalhados. Feriado: Corpus Christi 04/06.
+    cap:272, used:128.0, avail:144.0, pct:47.1, cost:2852.80,
+    clients:[
+      {name:'SPUNmers',            h:31.9, pct:27.5},
+      {name:'WIBR',                h:27.9, pct:24.1},
+      {name:'SPUN',                h:20.9, pct:18.0},
+      {name:'Roberta',             h:18.2, pct:15.7, isNew:true},
+      {name:'Spun for Publishers', h:6.8,  pct:5.8},
+      {name:'ABSOL.LOL',           h:5.9,  pct:5.1},
+      {name:'João',                h:3.8,  pct:3.3},
+      {name:'KAKAVEL',             h:0.7,  pct:0.6},
+    ],
+    bench:{'Carrossel':114,'Apresentação':212,'IDV':342,'Estático':40,'Site':396,'Vídeo':340,'E-mail':275,'Doc':82,'Story':24,'UI/UX':78},
+    people:[
+      {n:'Camile', t:58, a:667, h:105.5, avgh:1.8, hr:25.00, cpt:45.48, cpa:3.95},
+      {n:'Júlia',  t:10, a:199, h:22.5,  avgh:2.2, hr:9.55,  cpt:21.49, cpa:1.08},
+    ]
+  }];
 
 // ================================================================
 let curIdx = MONTHS.length - 1;
@@ -893,10 +915,10 @@ function buildIntensityFt(cxd, mname, wf, pctBruta){
 function renderKPIs(){
   const m=MONTHS[curIdx], p=curIdx>0?MONTHS[curIdx-1]:null;
   const ap=active(m), prevAP=p?active(p):null;
-  const cxKT = ['Janeiro','Fevereiro','Março','Abril','Maio'][Math.min(curIdx,4)];
+  const cxKT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho'][Math.min(curIdx,5)];
   const totT = (CX_DATA[cxKT] && CX_DATA[cxKT].total) || ap.reduce((s,p)=>s+p.t,0);
   const totA = ap.reduce((s,p)=>s+p.a,0);
-  const prevT=prevAP?((CX_DATA[['Janeiro','Fevereiro','Março','Abril','Maio'][Math.min(curIdx-1,3)]]||{}).total||prevAP.reduce((s,x)=>s+x.t,0)):null;
+  const prevT=prevAP?((CX_DATA[['Janeiro','Fevereiro','Março','Abril','Maio','Junho'][Math.min(curIdx-1,4)]]||{}).total||prevAP.reduce((s,x)=>s+x.t,0)):null;
   const prevA=prevAP?prevAP.reduce((s,x)=>s+x.a,0):null;
   function delta(c,pv){
     if(pv===null)return'';
@@ -910,7 +932,7 @@ function renderKPIs(){
   // Capacidade ponderada %: weighted_h / (cap * avg_weight_if_all_equal)
   // Simpler: raw_pct * intensity_factor gives "equivalent pct"
   const pondPct = Math.min(Math.round(m.pct * wFactor * 10)/10, 100);
-  const prevPondPct = p ? Math.min(Math.round(p.pct * (CX_DATA[['Janeiro','Fevereiro','Março','Abril','Maio'][Math.min(curIdx-1,3)]]||{intensity_factor:1}).intensity_factor * 10)/10, 100) : null;
+  const prevPondPct = p ? Math.min(Math.round(p.pct * (CX_DATA[['Janeiro','Fevereiro','Março','Abril','Maio','Junho'][Math.min(curIdx-1,4)]]||{intensity_factor:1}).intensity_factor * 10)/10, 100) : null;
 
   const ttPond = 'A capacidade ponderada considera a <strong>intensidade real</strong> das entregas, não só as horas brutas.<br><br>Cada nível de complexidade tem um peso (Baixa ×1 até Estratégica ×5). Em ' + cxKT + ': ' + f1(cxd2.raw_h) + 'h brutas → <strong>' + f1(cxd2.weighted_h) + 'h ponderadas</strong> (fator ×' + wFactor + ').<br><br>Meses com poucas horas mas demandas estratégicas pesam muito mais do que parecem.';
 
@@ -933,7 +955,7 @@ function renderKPIs(){
 function renderCap(){
   var m   = MONTHS[curIdx];
   var ap  = active(m);
-  var cxKeyCap = ['Janeiro','Fevereiro','Março','Abril','Maio'][Math.min(curIdx,4)];
+  var cxKeyCap = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho'][Math.min(curIdx,5)];
   var cxdCap   = CX_DATA[cxKeyCap] || CX_DATA['Março'];
   var wfCap    = cxdCap.intensity_factor;
   if(typeof window._capMode === 'undefined') window._capMode = 'bruta';
@@ -1344,7 +1366,10 @@ const AVG_H   = { Baixa:0.44, Média:1.33, Alta:2.07, Complexa:3.32, Estratégic
 const DESIGNER_CX = {
   'Janeiro': {
     'Camile': { total_t:20, total_h:30.9, cx:{ Baixa:{t:6,h:2.2}, Média:{t:8,h:5.9}, Alta:{t:3,h:9.3}, Complexa:{t:1,h:5.1}, Estratégica:{t:1,h:8.0} }},
-    'Júlia':  { total_t:20, total_h:11.9, cx:{ Baixa:{t:5,h:1.0}, Média:{t:14,h:8.4}, Alta:{t:1,h:0.5}, Complexa:{t:1,h:0.7} }},
+
+  'Junho':     { total:64,  raw_h:116.0, weighted_h:257.0, avg_w:1.83, intensity_factor:2.2,
+    // Transição: Camile absorvendo quase tudo (105.5h), Júlia saindo (22.5h)
+    levels:{ Baixa:{t:20,pct:31.2,h:20.9,designers:[{n:'Camile',t:19,h:19.4},{n:'Júlia',t:2,h:7.0}]}, Média:{t:38,pct:59.4,h:67.3,designers:[{n:'Camile',t:33,h:58.3},{n:'Júlia',t:7,h:12.3}]}, Alta:{t:3,pct:4.7,h:12.6,designers:[{n:'Camile',t:3,h:12.6},{n:'Júlia',t:1,h:3.2}]}, Complexa:{t:0,pct:0,h:0,designers:[]}, Estratégica:{t:1,pct:1.6,h:11.1,designers:[{n:'Camile',t:1,h:11.1}]} }},    'Júlia':  { total_t:20, total_h:11.9, cx:{ Baixa:{t:5,h:1.0}, Média:{t:14,h:8.4}, Alta:{t:1,h:0.5}, Complexa:{t:1,h:0.7} }},
     'Carol':  { total_t:16, total_h:8.2,  cx:{ Baixa:{t:3,h:0.3}, Média:{t:6,h:5.9}, Alta:{t:6,h:1.9}, Complexa:{t:1,h:0.1} }},
   },
   'Fevereiro': {
@@ -1367,6 +1392,10 @@ const DESIGNER_CX = {
     'Camile': { total_t:36, total_h:92.3,  cx:{ Baixa:{t:17,h:11.3}, Média:{t:15,h:31.6}, Alta:{t:2,h:23.3}, Estratégica:{t:2,h:26.1} }},
     'Júlia':  { total_t:30, total_h:43.2,  cx:{ Baixa:{t:16,h:13.5}, Média:{t:12,h:21.8}, Alta:{t:2,h:8.0}  }},
   },
+  'Junho': {
+    'Camile': { total_t:58, total_h:105.5, cx:{ Baixa:{t:19,h:19.4}, Média:{t:33,h:58.3}, Alta:{t:3,h:12.6}, Estratégica:{t:1,h:11.1} }},
+    'Júlia':  { total_t:10, total_h:22.5,  cx:{ Baixa:{t:2,h:7.0},   Média:{t:7,h:12.3},  Alta:{t:1,h:3.2}  }},
+  },
 };
 const CX_COLORS = { Baixa:'#00d68f', Média:'#7b61ff', Alta:'#ffb800', Complexa:'#ff4d6a', Estratégica:'#f093fb' };
 
@@ -1380,11 +1409,13 @@ const FORMAT_DATA = {
   'Abril':     { 'Estático':{t:17,h:16.3,a:64,avg:58}, 'Carrossel':{t:13,h:17.4,a:85,avg:81}, 'Vídeo':{t:13,h:30.7,a:41,avg:142}, 'Story':{t:7,h:6.0,a:33,avg:51}, 'Apresentação':{t:4,h:18.5,a:64,avg:278}, 'Impressão':{t:4,h:4.8,a:20,avg:73}, 'IDV':{t:2,h:17.8,a:8,avg:533}, 'Outro':{t:2,h:8.6,a:12,avg:256}, 'Capa Redes':{t:3,h:1.3,a:6,avg:26} },
   // Maio: Reels→Vídeo, UX/UI e Site novos formatos
   'Maio':      { 'Estático':{t:22,h:29.9,a:54,avg:82}, 'Carrossel':{t:20,h:35.0,a:137,avg:105}, 'Story':{t:9,h:12.3,a:80,avg:82}, 'Vídeo':{t:6,h:17.3,a:9,avg:173}, 'UI/UX':{t:5,h:24.5,a:5,avg:294}, 'Capa Redes':{t:3,h:10.3,a:6,avg:207}, 'Outro':{t:3,h:3.0,a:4,avg:60}, 'Site':{t:2,h:16.4,a:3,avg:492}, 'IDV':{t:1,h:15.4,a:1,avg:927}, 'Motion':{t:1,h:12.8,a:0,avg:768} },
+  // Junho: transição, Camile absorvendo maior parte
+  'Junho':     { 'Carrossel':{t:28,h:53.1,a:433,avg:114}, 'Estático':{t:19,h:12.6,a:34,avg:40}, 'Apresentação':{t:7,h:24.7,a:186,avg:212}, 'Story':{t:6,h:2.4,a:27,avg:24}, 'IDV':{t:3,h:17.1,a:25,avg:342}, 'Doc':{t:2,h:2.8,a:16,avg:82}, 'Outro':{t:2,h:2.5,a:256,avg:76}, 'Site':{t:1,h:6.6,a:1,avg:396}, 'Vídeo':{t:1,h:5.7,a:1,avg:340}, 'E-mail':{t:1,h:4.6,a:17,avg:275}, 'UI/UX':{t:1,h:1.3,a:1,avg:78} },
 };
 const FMT_COLORS = {'Carrossel':'#7b61ff','Estático':'#00c9b1','Story':'#ffb800','Vídeo':'#ff4d6a','Motion':'#f093fb','Apresentação':'#4facfe','IDV':'#43e97b','UI/UX':'#00f2fe','Estratégico':'#ff7e5f','Doc':'#a48fff','Capa Redes':'#fd9644','Evento':'#2ed573','Impressão':'#ffa502','Outro':'#636680'};
 
 const LEVELS  = ['Baixa','Média','Alta','Complexa','Estratégica'];
-const CX_MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio'];
+const CX_MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho'];
 
 // ── FUSED SECTION: Absorção + Complexidade ──
 
@@ -1853,7 +1884,7 @@ function renderFused() {
       </div>
     </div>  `;
   // init wheel with current month cx data
-  var _wMonth = ['Janeiro','Fevereiro','Março','Abril','Maio'][Math.min(curIdx,4)];
+  var _wMonth = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho'][Math.min(curIdx,5)];
   initWheel(_wMonth);
 }
 
@@ -2086,10 +2117,10 @@ function renderAutoReport(){
 
   const reports = MONTHS.map((m, idx) => {
     const ap = active(m);
-    const cxKey = ['Janeiro','Fevereiro','Março','Abril','Maio'][Math.min(idx, 2)];
+    const cxKey = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho'][Math.min(idx, 2)];
     const cxd   = CX_DATA[cxKey] || CX_DATA['Março'];
 
-    const cxKT = ['Janeiro','Fevereiro','Março','Abril','Maio'][Math.min(curIdx,4)];
+    const cxKT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho'][Math.min(curIdx,5)];
     const totT = (CX_DATA[cxKT] && CX_DATA[cxKT].total) || ap.reduce((s,p)=>s+p.t,0);
     const totA = ap.reduce((s,p)=>s+p.a,0);
     const wfact = cxd.intensity_factor;
@@ -2195,8 +2226,8 @@ function renderFormats() {
   if(!wrap) return;
   if(typeof window._fmtMode === 'undefined') window._fmtMode = 'mensal';
   var isAnual = window._fmtMode === 'anual';
-  var mnames  = ['Janeiro','Fevereiro','Março','Abril','Maio'];
-  var mname   = mnames[Math.min(curIdx,4)];
+  var mnames  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho'];
+  var mname   = mnames[Math.min(curIdx,5)];
 
   // Build toggle
   var toggle = '<div style="display:flex;gap:4px;background:var(--card2);border:1px solid var(--border);padding:3px;border-radius:8px;width:fit-content">'
@@ -2317,7 +2348,7 @@ function renderStaffingLimit() {
   if(!el) return;
   var m=MONTHS[curIdx];
   var ap=active(m);
-  var mnames=['Janeiro','Fevereiro','Março','Abril','Maio'];
+  var mnames=['Janeiro','Fevereiro','Março','Abril','Maio','Junho'];
   var avgH=mnames.reduce(function(s,mn){var d=FORMAT_DATA[mn]||{};return s+Object.values(d).reduce(function(ss,v){return ss+v.h;},0);},0)/mnames.length;
   var capPP=m.wd*m.hd;
   var totalCap=ap.reduce(function(s,p){return s+capPP*((PC[p.n]&&PC[p.n].exec)||1);},0);
